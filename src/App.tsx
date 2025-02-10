@@ -57,7 +57,8 @@ const App = () => {
     };
 
     fetchData();
-  }, [setSettings, setUser, setIsAuth]);
+    changeTheme(isDark);
+  }, []);
 
   if (isLoading) {
     return (
