@@ -3,9 +3,12 @@ const NotFound = () => {
   return (
     <div
       style={{
-        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        marginLeft: "auto",
+        marginRight: "auto",
         fontSize: "2rem",
-        textAlign: "center",
         marginTop: "6rem",
         color: "#6b798e",
       }}
