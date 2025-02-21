@@ -1,9 +1,9 @@
 import { create } from "zustand";
 
 interface AuthStore {
-  user: API.User | null;
+  user: API.UserVO | null;
   isAuth: boolean,
-  setUser: (user: API.User | null) => void;
+  setUser: (user: API.UserVO | null) => void;
   setIsAuth: (b: boolean) => void;
 }
 
