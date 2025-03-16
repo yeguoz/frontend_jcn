@@ -24,7 +24,10 @@ const BreadcrumbToolkit = () => {
     _1: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>[],
     paths: string[]
   ) {
-    const onCilck = () => {
+    const onCilck = async () => {
+      if(paths[paths.length - 1] === currentRoute.path) {
+        fetchUserFiles();
+      }
       setSelectedRows([]);
     };
 
@@ -45,7 +48,7 @@ const BreadcrumbToolkit = () => {
   }
 
   useEffect(() => {
-    // 路径变化时更新面包屑 获取文件列表
+    // 路径变化时更新面包屑 并获取文件列表
     const breadrumbitems = [{ path: "/", name: "/" }];
     path
       .split("/")
