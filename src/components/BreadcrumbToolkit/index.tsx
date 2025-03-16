@@ -1,70 +1,69 @@
 import { Breadcrumb } from "antd";
 import { Link } from "react-router";
-import deepEqualUtil from "../../utils/deepEqualUtil";
-import { getUserFiles } from "../../services/userFileController";
-import useDataStore from "../../store/useDataStore";
 import useBreadcurmbStore from "../../store/useBreadcurmbStore";
-import { BreadcrumbItemType, BreadcrumbSeparatorType } from "antd/es/breadcrumb/Breadcrumb";
-import { Dispatch, SetStateAction } from "react";
+import {
+  BreadcrumbItemType,
+  BreadcrumbSeparatorType,
+} from "antd/es/breadcrumb/Breadcrumb";
+import { useEffect } from "react";
+import useVisibleAndRowsStore from "../../store/useVisibleRowsPosStore";
+import useFetchUserFiles from "../../hooks/useFetchUserFiles";
 
-const BreadcrumbToolkit = ({setSelectedRows}:{setSelectedRows:Dispatch<SetStateAction<API.FileDTO[]>>}) => {
-  const setData = useDataStore((state) => state.setData);
+const BreadcrumbToolkit = () => {
   const setItems = useBreadcurmbStore((state) => state.setItems);
   const items = useBreadcurmbStore((state) => state.items);
+  const setSelectedRows = useVisibleAndRowsStore(
+    (state) => state.setSelectedRows
+  );
+  const { path, fetchUserFiles } = useFetchUserFiles();
 
   // 通过items渲染面包屑
   function itemRender(
     currentRoute: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>,
-    params: object,
-    items: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>[],
+    _0: object,
+    _1: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>[],
     paths: string[]
   ) {
-    const onCilck = async () => {
-      console.log("params:", params);
-      let newUrl = "";
-      for (const variable of items) {
-        // 处理家目录以外路径
-        if (variable.path !== "/") {
-          newUrl = `${newUrl}/${variable.path}`;
-        }
-        console.log("newUrl", newUrl);
-        if (deepEqualUtil(variable, currentRoute)) {
-          break;
-        }
-      }
-      // 处理家目录路径
-      if (newUrl === "") {
-        newUrl = "/";
-      }
-      // 发送请求
-      const response = await getUserFiles(newUrl);
-      setData(response.data.list);
-      // 更新面包屑
-      const breadrumbitems = [{ path: "/", name: "/" }];
-      newUrl
-        .split("/")
-        .filter((item) => item !== "")
-        .map((item) => {
-          breadrumbitems.push({ path: item, name: item });
-        });
-      setItems(breadrumbitems);
-      // 清空选中行
+    const onCilck = () => {
       setSelectedRows([]);
     };
 
     return (
-      <Link to={`/home?path=${paths.join("/")}`} onClick={onCilck}>
+      <Link
+        to={`/home?path=${encodeURIComponent(paths.join("/"))}`}
+        onClick={onCilck}
+        style={{
+          padding: "0 16px",
+          height: "40px",
+          lineHeight: "40px",
+          borderRadius: "10px",
+        }}
+      >
         {currentRoute.path}
       </Link>
     );
   }
+
+  useEffect(() => {
+    // 路径变化时更新面包屑 获取文件列表
+    const breadrumbitems = [{ path: "/", name: "/" }];
+    path
+      .split("/")
+      .filter((item) => item !== "")
+      .map((item) => {
+        breadrumbitems.push({ path: item, name: item });
+      });
+    setItems(breadrumbitems);
+    fetchUserFiles();
+  }, [path, setItems, fetchUserFiles]);
+
   return (
     <div
       style={{
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        minHeight: "45px",
+        minHeight: 45,
         backgroundColor: "#fff",
         padding: "0 16px",
         userSelect: "none",
@@ -72,9 +71,18 @@ const BreadcrumbToolkit = ({setSelectedRows}:{setSelectedRows:Dispatch<SetStateA
       }}
     >
       <Breadcrumb
-        separator=">"
+        separator={
+          <div
+            style={{
+              height: "40px",
+              lineHeight: "40px",
+            }}
+          >
+            &gt;
+          </div>
+        }
         style={{
-          fontSize: "16px",
+          fontSize: 16,
         }}
         itemRender={itemRender}
         items={items}
