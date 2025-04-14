@@ -5,7 +5,7 @@ import useSettingStore from "../../../store/useSettingStore";
 import { useEffect, useState } from "react";
 import styles from "../index.module.css";
 import { getCaptcha, register } from "../../../services/userController";
-import { SESSION_CAPTCHA_REGISTER } from "../../../constant/common";
+import { SESSION_CAPTCHA_REGISTER } from "../../../constants/common";
 
 interface FormValues {
   email: string;
@@ -62,9 +62,7 @@ export const Register = () => {
         className={styles.form}
       >
         <div>
-          <IdcardOutlined
-            style={{ fontSize: 25, color: token.colorPrimary }}
-          />
+          <IdcardOutlined style={{ fontSize: 25, color: token.colorPrimary }} />
           <div
             style={{
               fontSize: 20,

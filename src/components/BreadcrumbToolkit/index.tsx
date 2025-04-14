@@ -1,4 +1,4 @@
-import { Breadcrumb } from "antd";
+import { Breadcrumb, Flex } from "antd";
 import { Link } from "react-router";
 import useBreadcurmbStore from "../../store/useBreadcurmbStore";
 import {
@@ -15,7 +15,7 @@ const BreadcrumbToolkit = () => {
   const setSelectedRows = useVisibleAndRowsStore(
     (state) => state.setSelectedRows
   );
-  const { path, fetchUserFiles } = useFetchUserFiles();
+  const { path, fetchUserFiles,pathRef } = useFetchUserFiles();
 
   // 通过items渲染面包屑
   function itemRender(
@@ -25,8 +25,9 @@ const BreadcrumbToolkit = () => {
     paths: string[]
   ) {
     const onCilck = async () => {
-      if(paths[paths.length - 1] === currentRoute.path) {
-        fetchUserFiles();
+      const currentPath = paths[paths.length - 1] ===''?'/':paths[paths.length - 1];
+      if (currentPath === currentRoute.path ) {
+        fetchUserFiles(pathRef.current);
       }
       setSelectedRows([]);
     };
@@ -57,15 +58,14 @@ const BreadcrumbToolkit = () => {
         breadrumbitems.push({ path: item, name: item });
       });
     setItems(breadrumbitems);
-    fetchUserFiles();
-  }, [path, setItems, fetchUserFiles]);
+    fetchUserFiles(pathRef.current);
+  }, [path, setItems, fetchUserFiles,pathRef]);
 
   return (
-    <div
+    <Flex
+      justify="space-between"
+      align="center"
       style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
         minHeight: 45,
         backgroundColor: "#fff",
         padding: "0 16px",
@@ -90,7 +90,7 @@ const BreadcrumbToolkit = () => {
         itemRender={itemRender}
         items={items}
       />
-    </div>
+    </Flex>
   );
 };
 

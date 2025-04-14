@@ -17,6 +17,8 @@ const NotFound = () => {
         <FrownOutlined style={{fontSize: "10rem"}}/>
       </div>
       <div>404 Not Found</div>
+      <button onClick={()=>{
+      }}>ok</button>
     </div>
   );
 };

@@ -1,7 +1,23 @@
-#root {
-  height: 100vh;
+.ant-table-body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
-
 .inputHeight {
   height: 3.5rem;
+}
+
+.icon {
+  cursor: pointer;
+}
+.icon:hover {
+  background-color: rgba(50, 50, 50, 0.4);
+  border-radius: 50%;
+}
+.outlinedIcon {
+  transition: all 0.3s;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
 }

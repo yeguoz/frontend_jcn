@@ -1,6 +1,6 @@
 import "./App.css";
 import { Navigate, Route, Routes } from "react-router";
-import { NotFound } from "./pages/404";
+import NotFound from "./pages/404";
 import Forget from "./pages/Auth/Forget";
 import { useEffect, useState } from "react";
 import { getAuthSetting } from "./services/settingController";
@@ -13,96 +13,116 @@ import AuthGuard from "./components/AuthGuard";
 import { Home } from "./pages/Home";
 import { getCurrentUser } from "./services/userController";
 import useAuthStore from "./store/useAuthStore";
-import { ConfigProvider, Spin } from "antd";
-import themeConfig from "../config/themeConfig";
-import useThemeStore from "./store/useThemeStore";
+import { ConfigProvider, Flex, Skeleton, ThemeConfig } from "antd";
+import { lightTheme } from "../config/themeConfig";
+import { Admin } from "./pages/Admin";
+import useNavStore from "./store/useNavStore";
+import { Share } from "./pages/Share";
+import { AdminHome } from "./pages/Admin/AdminHome";
+import { Setting } from "./pages/Setting";
+import { Preview } from "./pages/Preview";
+import { Basic } from "./pages/Admin/Basic";
+import { useWorkerStore } from "./store/useWorkerStore";
 
 const App = () => {
   const setSettings = useSettingStore((state) => state.setSettings);
   const setUser = useAuthStore((state) => state.setUser);
   const setIsAuth = useAuthStore((state) => state.setIsAuth);
+  const setIsOpen = useNavStore((state) => state.setIsOpen);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentTheme, setCurrentTheme] = useState(themeConfig);
-  const isDark = useThemeStore((state) => state.isDark);
-
-  const changeTheme = (isDark: boolean) => {
-    const newTheme = {
-      ...currentTheme,
-      token: {
-        ...currentTheme.token,
-        colorPrimary: isDark ? "#212121" : themeConfig.token.colorPrimary,
-        colorLink: isDark ? "#212121" : themeConfig.token.colorPrimary,
-        colorBgBase: isDark ? "#424242" : "#fafafa",
-      },
-    };
-    setCurrentTheme(newTheme);
-  };
+  const [currentTheme] = useState<ThemeConfig>(lightTheme);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const authResult = await getAuthSetting();
         setSettings(authResult);
-
         const userResult: API.Response = await getCurrentUser();
         setUser(userResult.data);
         if (userResult.data) {
           setIsAuth(true);
+          setIsOpen(true);
+        } else {
+          const terminateWorker = await useWorkerStore.getState()
+            .terminateWorker;
+          terminateWorker();
         }
       } catch (error) {
-        console.error("Failed to fetch data:", error);
+        console.error("App.tsx:Failed to fetch data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchData();
-    changeTheme(isDark);
-  }, []);
+  }, [setIsAuth, setSettings, setUser, setIsOpen]);
 
   if (isLoading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
+    return <Skeleton active />;
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: isDark ? "#303030" : "#fafafa",
-      }}
-    >
-      <ConfigProvider theme={currentTheme}>
-        <Header changeTheme={changeTheme} />
-        <Routes>
-          <Route element={<Auth />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forget" element={<Forget />} />
-          </Route>
-          <Route
-            path="/home"
-            element={
-              <AuthGuard>
-                <Home />
-              </AuthGuard>
-            }
-          />
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </ConfigProvider>
-    </div>
+    <>
+      <div
+        style={{
+          height: "100vh",
+          backgroundColor: lightTheme.token.colorBgBase,
+        }}
+      >
+        <Flex vertical={true}>
+          <ConfigProvider theme={currentTheme}>
+            {/* Header 部分 */}
+            <Header />
+            <Flex style={{ height: "calc(100vh - 60px)" }}>
+              {/* 主体部分 */}
+              <Routes>
+                <Route
+                  element={
+                    <AuthGuard>
+                      <Auth />
+                    </AuthGuard>
+                  }
+                >
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forget" element={<Forget />} />
+                </Route>
+                <Route
+                  path="/home"
+                  element={
+                    <AuthGuard>
+                      <Home />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path="/setting"
+                  element={
+                    <AuthGuard>
+                      <Setting />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  element={
+                    <AuthGuard>
+                      <Admin />
+                    </AuthGuard>
+                  }
+                >
+                  <Route path="/admin" element={<AdminHome />} />
+                  <Route path="/admin/home" element={<AdminHome />} />
+                  <Route path="/admin/basic" element={<Basic />} />
+                </Route>
+                <Route path="/preview" element={<Preview />} />
+                <Route path="/s/:shortId" element={<Share />} />
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Flex>
+          </ConfigProvider>
+        </Flex>
+      </div>
+    </>
   );
 };
 

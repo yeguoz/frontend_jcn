@@ -6,7 +6,7 @@ import useSettingStore from "../../../store/useSettingStore";
 import { getCaptcha, login } from "../../../services/userController";
 import styles from "../index.module.css";
 import useAuthStore from "../../../store/useAuthStore";
-import { SESSION_CAPTCHA_LOGIN } from "../../../constant/common";
+import { SESSION_CAPTCHA_LOGIN } from "../../../constants/common";
 import useNavStore from "../../../store/useNavStore";
 
 interface FormValues {

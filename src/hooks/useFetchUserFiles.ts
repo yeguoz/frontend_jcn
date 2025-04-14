@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 import { getUserFiles } from "../services/userFileController";
 import useDataStore from "../store/useDataStore";
@@ -6,22 +6,28 @@ import useLoadingStore from "../store/useLoadingStore";
 
 const useFetchUserFiles = () => {
   const [searchParams] = useSearchParams();
+  const path = searchParams.get("path") || "/";
   const setData = useDataStore((state) => state.setData);
   const setTableIsLoading = useLoadingStore(
     (state) => state.setTableIsLoading
   );
-  const path = searchParams.get("path") || "/";
+  const pathRef = useRef(path);
 
-  const fetchUserFiles = useCallback(async () => {
+  useEffect(() => {
+    pathRef.current = path;
+  }, [path]);
+
+  const fetchUserFiles = useCallback(async (path: string) => {
     setTableIsLoading(true);
     const response = await getUserFiles(path);
     setData(response.data.list);
     setTableIsLoading(false);
-  }, [path, setData, setTableIsLoading]);
+  }, [setData, setTableIsLoading]);
 
   return {
     path,
     fetchUserFiles,
+    pathRef
   }
 }
 
