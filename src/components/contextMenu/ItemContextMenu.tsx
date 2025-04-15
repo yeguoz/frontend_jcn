@@ -142,7 +142,7 @@ const FileContextMenu = () => {
     setItemCtxMenuVisible(false);
   };
 
-  const dowloadFile = async () => {
+  const downloadFile = async () => {
     const url = `/api/${selectedRecord?.sourceName}`;
     const link = document.createElement("a");
     link.href = url;
@@ -172,7 +172,7 @@ const FileContextMenu = () => {
       <Item
         icon={<CloudDownloadOutlined />}
         title={"下载文件"}
-        onClick={dowloadFile}
+        onClick={downloadFile}
       />
       {/* <Item icon={<ZipIcon />} title={"压缩"} /> */}
       <Item

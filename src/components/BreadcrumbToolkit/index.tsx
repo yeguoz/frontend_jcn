@@ -1,6 +1,6 @@
 import { Breadcrumb, Flex } from "antd";
 import { Link } from "react-router";
-import useBreadcurmbStore from "../../store/useBreadcurmbStore";
+import useBreadcrumbStore from "../../store/useBreadcrumbStore";
 import {
   BreadcrumbItemType,
   BreadcrumbSeparatorType,
@@ -10,12 +10,12 @@ import useVisibleAndRowsStore from "../../store/useVisibleRowsPosStore";
 import useFetchUserFiles from "../../hooks/useFetchUserFiles";
 
 const BreadcrumbToolkit = () => {
-  const setItems = useBreadcurmbStore((state) => state.setItems);
-  const items = useBreadcurmbStore((state) => state.items);
+  const setItems = useBreadcrumbStore((state) => state.setItems);
+  const items = useBreadcrumbStore((state) => state.items);
   const setSelectedRows = useVisibleAndRowsStore(
     (state) => state.setSelectedRows
   );
-  const { path, fetchUserFiles,pathRef } = useFetchUserFiles();
+  const { path, fetchUserFiles, pathRef } = useFetchUserFiles();
 
   // 通过items渲染面包屑
   function itemRender(
@@ -24,9 +24,10 @@ const BreadcrumbToolkit = () => {
     _1: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>[],
     paths: string[]
   ) {
-    const onCilck = async () => {
-      const currentPath = paths[paths.length - 1] ===''?'/':paths[paths.length - 1];
-      if (currentPath === currentRoute.path ) {
+    const onClick = async () => {
+      const currentPath =
+        paths[paths.length - 1] === "" ? "/" : paths[paths.length - 1];
+      if (currentPath === currentRoute.path) {
         fetchUserFiles(pathRef.current);
       }
       setSelectedRows([]);
@@ -35,7 +36,7 @@ const BreadcrumbToolkit = () => {
     return (
       <Link
         to={`/home?path=${encodeURIComponent(paths.join("/"))}`}
-        onClick={onCilck}
+        onClick={onClick}
         style={{
           padding: "0 16px",
           height: "40px",
@@ -50,16 +51,16 @@ const BreadcrumbToolkit = () => {
 
   useEffect(() => {
     // 路径变化时更新面包屑 并获取文件列表
-    const breadrumbitems = [{ path: "/", name: "/" }];
+    const breadcrumbItems = [{ path: "/", name: "/" }];
     path
       .split("/")
       .filter((item) => item !== "")
       .map((item) => {
-        breadrumbitems.push({ path: item, name: item });
+        breadcrumbItems.push({ path: item, name: item });
       });
-    setItems(breadrumbitems);
+    setItems(breadcrumbItems);
     fetchUserFiles(pathRef.current);
-  }, [path, setItems, fetchUserFiles,pathRef]);
+  }, [path, setItems, fetchUserFiles, pathRef]);
 
   return (
     <Flex

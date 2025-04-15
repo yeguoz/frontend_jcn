@@ -1,10 +1,8 @@
 import {
-  Button,
   Flex,
   FloatButton,
   notification,
   Skeleton,
-  Spin,
   Table,
 } from "antd";
 import BreadcrumbToolkit from "../../components/BreadcrumbToolkit";
@@ -17,7 +15,6 @@ import {
   uploadChunk,
 } from "../../services/userFileController";
 import useDataStore from "../../store/useDataStore";
-import useBreadcurmbStore from "../../store/useBreadcurmbStore";
 import { useNavigate } from "react-router";
 import HeaderMenu from "../../components/HeaderMenu";
 import ContextMenu from "../../components/contextMenu/ContextMenu";
@@ -37,11 +34,12 @@ import Navbar from "../../components/Navbar";
 import useUploadStore from "../../store/useUploadStore";
 import { useWorkerStore } from "../../store/useWorkerStore";
 import { debounce, throttle } from "lodash";
+import useBreadcrumbStore from "../../store/useBreadcrumbStore";
 
 export const Home = () => {
   const navigate = useNavigate();
   const { data } = useDataStore((state) => state);
-  const { items, setNewItem } = useBreadcurmbStore((state) => state);
+  const { items, setNewItem } = useBreadcrumbStore((state) => state);
   const { tableIsLoading, setTableIsLoading } = useLoadingStore(
     (state) => state
   );
@@ -251,7 +249,7 @@ export const Home = () => {
         console.error("预处理错误:", error);
       }
     }
-
+    
     // 所有文件预处理完成后统一上传
     await Promise.all(
       uploadTasks.map(async ({ file, uploadId, fingerprint }) => {
@@ -458,12 +456,12 @@ export const Home = () => {
                   setItemCtxMenuVisible(false);
                   setMultipleMenuVisible(false);
                   setSelectedRows(selectedRows);
-                  // todo多选处理 显示菜单
+                  // TODO多选处理 显示菜单
                   if (
                     selectedRows.length <= 1 &&
                     selectedRows[0]?.type === "folder"
                   ) {
-                    // todo 单选文件夹 显示菜单
+                    // TODO 单选文件夹 显示菜单
                     console.log("选中文件夹selectedRows", selectedRows);
                     setSelectedRecord(selectedRows[0]);
                   }
@@ -471,7 +469,7 @@ export const Home = () => {
                     selectedRows.length <= 1 &&
                     selectedRows[0]?.type === "file"
                   ) {
-                    // todo 单选文件 显示菜单
+                    // TODO 单选文件 显示菜单
                     console.log("选中文件selectedRows", selectedRows);
                     setSelectedRecord(selectedRows[0]);
                   }
@@ -480,8 +478,8 @@ export const Home = () => {
               locale={{ emptyText: "no data" }}
               onRow={(record) => {
                 return {
-                  // todo操作菜单两种类型，类型1：右键目录或文件，类型2：右键其他位置
-                  // todo单击选中文件或目录，弹出操作菜单
+                  // TODO操作菜单两种类型，类型1：右键目录或文件，类型2：右键其他位置
+                  // TODO单击选中文件或目录，弹出操作菜单
                   onClick: async () => {
                     // 文件处理
                     // if (record.type === "file") {
@@ -595,7 +593,7 @@ export const Home = () => {
           console.log(import.meta.url);
         }}
       >
-        anniu
+        按钮
       </Button> */}
     </Flex>
   );

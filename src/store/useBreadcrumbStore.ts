@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
-type BreadcurmItems = { path: string, name: string };
+type BreadcrumbItems = { path: string, name: string };
 
-interface BreadcurmStore {
-  items: BreadcurmItems[];
-  setNewItem: (items: BreadcurmItems) => void;
-  setItems: (newItems: BreadcurmItems[]) => void;
+interface BreadcrumbStore {
+  items: BreadcrumbItems[];
+  setNewItem: (items: BreadcrumbItems) => void;
+  setItems: (newItems: BreadcrumbItems[]) => void;
 }
 
 function getInitialItems() {
@@ -14,20 +14,20 @@ function getInitialItems() {
   if (path === null || path === "") {
     path = "/";
   }
-  const breadrumbitems = [{ path: "/", name: "/" }];
+  const breadcrumbItems = [{ path: "/", name: "/" }];
   path
     .split("/")
     .filter((item) => item !== "")
     .map((item) => {
-      breadrumbitems.push({ path: item, name: item });
+      breadcrumbItems.push({ path: item, name: item });
     });
-  return breadrumbitems;
+  return breadcrumbItems;
 }
 
-const useBreadcurmbStore = create<BreadcurmStore>((set) => ({
+const useBreadcrumbStore = create<BreadcrumbStore>((set) => ({
   items: getInitialItems(),
   setNewItem: (newItem) => set((state) => ({ items: [...state.items, newItem] })),
   setItems: (newItems) => set({ items: newItems })
 }));
 
-export default useBreadcurmbStore;
+export default useBreadcrumbStore;

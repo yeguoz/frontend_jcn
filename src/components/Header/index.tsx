@@ -19,10 +19,9 @@ import {
 import { Link, useNavigate } from "react-router";
 import useAuthStore from "../../store/useAuthStore";
 import useNavStore from "../../store/useNavStore";
-import useBreadcurmbStore from "../../store/useBreadcurmbStore";
 import DataTransferIcon from "../icon/DataTransferIcon";
 import { logout } from "../../services/userController";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ADMIN,
   adminItems,
@@ -32,6 +31,7 @@ import {
 import { useWorkerStore } from "../../store/useWorkerStore";
 import UploadQueue from "./components/UploadQueue";
 import useUploadStore from "../../store/useUploadStore";
+import useBreadcrumbStore from "../../store/useBreadcrumbStore";
 
 const { useToken } = theme;
 const Header = () => {
@@ -42,7 +42,7 @@ const Header = () => {
     (state) => state
   );
   const isAuth = useAuthStore((state) => state.isAuth);
-  const setItems = useBreadcurmbStore((state) => state.setItems);
+  const setItems = useBreadcrumbStore((state) => state.setItems);
   const setUser = useAuthStore((state) => state.setUser);
   const user = useAuthStore((state) => state.user);
   const setIsAuth = useAuthStore((state) => state.setIsAuth);
@@ -128,7 +128,7 @@ const Header = () => {
             }
           }}
         >
-          Cloudnest
+          CloudNest
         </Link>
         <Input
           placeholder="搜索..."
@@ -159,11 +159,7 @@ const Header = () => {
               onOpenChange={setOpen}
               dropdownRender={() => <UploadQueue />}
             >
-              <Badge
-                count={uncompletedCount}
-                offset={[-5, 8]}
-                size="small"
-              >
+              <Badge count={uncompletedCount} offset={[-5, 8]} size="small">
                 <DataTransferIcon className="outlinedIcon" />
               </Badge>
             </Dropdown>
