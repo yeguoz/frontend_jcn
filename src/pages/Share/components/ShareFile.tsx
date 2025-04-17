@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import { fetchDownloadFile } from "../../../services/userFileController";
 import { Avatar, Button, Card, Divider, Flex } from "antd";
 import dateFormatUtil from "../../../utils/dateFormatUtil";
-import formatFileSizeUtil from "../../../utils/formatFileSizeUtil";
+import formatBytesUtil from "../../../utils/formatBytesUtil";
 import { FileOutlined, UserOutlined } from "@ant-design/icons";
 import useShareStore from "../../../store/useShareStore";
 
@@ -30,7 +30,7 @@ const ShareFile = () => {
   };
 
   return (
-    <Flex justify="center" style={{ margin: "100px auto 0",height:'250px' }}>
+    <Flex justify="center" style={{ margin: "100px auto 0", height: "250px" }}>
       <Card
         title={
           <Flex vertical={true} gap={10} align="center">
@@ -60,7 +60,7 @@ const ShareFile = () => {
               <span>{data?.filename}aa</span>
             </div>
             <div>
-              <span>{data?.size ? formatFileSizeUtil(data.size) : 0}</span>
+              <span>{data?.size ? formatBytesUtil(data.size) : 0}</span>
             </div>
           </Flex>
         </Flex>
