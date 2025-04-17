@@ -1,10 +1,7 @@
 import { Flex, Tooltip } from "antd";
-import {
-  CloudDownloadOutlined,
-  EnterOutlined,
-} from "@ant-design/icons";
+import { CloudDownloadOutlined, EnterOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import formatFileSizeUtil from "../../../utils/formatFileSizeUtil";
+import formatBytesUtil from "../../../utils/formatBytesUtil";
 import useShareStore from "../../../store/useShareStore";
 import useFetchSharedUserFiles from "../../../hooks/useFetchSharedUserFiles";
 import { fetchDownloadFile } from "../../../services/userFileController";
@@ -37,7 +34,7 @@ const HeaderMenu = () => {
           <span>{name}</span>
         )}
         {selectedRows.length === 1 && type === "file" && (
-          <span>&nbsp;&nbsp;({formatFileSizeUtil(size)})</span>
+          <span>&nbsp;&nbsp;({formatBytesUtil(size)})</span>
         )}
       </div>
       <Flex gap={15}>
@@ -52,14 +49,10 @@ const HeaderMenu = () => {
   );
 };
 const Folder = () => {
-  const { path,pwd } = useFetchSharedUserFiles();
+  const { path, pwd } = useFetchSharedUserFiles();
   const navigate = useNavigate();
-  const selectedRecord = useShareStore(
-    (state) => state.selectedRecord
-  );
-  const setSelectedRows = useShareStore(
-    (state) => state.setSelectedRows
-  );
+  const selectedRecord = useShareStore((state) => state.selectedRecord);
+  const setSelectedRows = useShareStore((state) => state.setSelectedRows);
 
   const onEnterFolder = () => {
     const newPath = encodeURIComponent(path + "/" + selectedRecord?.name);
@@ -86,18 +79,10 @@ const Folder = () => {
 
 const File = () => {
   const navigate = useNavigate();
-  const selectedRecord = useShareStore(
-    (state) => state.selectedRecord
-  );
-  const data = useShareStore(
-    (state) => state.data
-  );
-  const shortId = useShareStore(
-    (state) => state.shortId
-  ); 
-  const setSelectedRows = useShareStore(
-    (state) => state.setSelectedRows
-  );
+  const selectedRecord = useShareStore((state) => state.selectedRecord);
+  const data = useShareStore((state) => state.data);
+  const shortId = useShareStore((state) => state.shortId);
+  const setSelectedRows = useShareStore((state) => state.setSelectedRows);
 
   const handleDownload = async () => {
     await fetchDownloadFile(
@@ -113,13 +98,13 @@ const File = () => {
       )}&filename=${encodeURIComponent(selectedRecord?.name as string)}`
     );
     setSelectedRows([]);
-  }
+  };
 
   return (
     <>
       <div className="icon">
         <Tooltip title="预览" arrow={false} color={"#757575"}>
-          <EnterOutlined className="outlinedIcon" onClick={handlePreview}/>
+          <EnterOutlined className="outlinedIcon" onClick={handlePreview} />
         </Tooltip>
       </div>
       <div className="icon">
