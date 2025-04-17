@@ -1,6 +1,6 @@
 import React from "react";
 import { Progress, theme } from "antd";
-import formatFileSizeUtil from "../../utils/formatFileSizeUtil";
+import formatBytesUtil from "../../utils/formatBytesUtil";
 
 interface StorageProgressProps {
   usedStorage: number; // 已使用的存储量
@@ -30,7 +30,7 @@ const StorageProgress: React.FC<StorageProgressProps> = ({
         size={"small"}
       />
       <div style={{ marginTop: 8, fontSize: 12 }}>
-        {formatFileSizeUtil(usedStorage)} / {formatFileSizeUtil(totalStorage)}
+        {formatBytesUtil(usedStorage)} / {formatBytesUtil(totalStorage)}
       </div>
     </div>
   );
