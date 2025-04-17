@@ -99,13 +99,18 @@ export const previewFile = async (filePath: string) => {
   }
 }
 
-export const fetchUploadSession = async (fingerprint: string, totalChunks: number, filename: string) => {
+export const fetchUploadSession = async (fingerprint: string, totalChunks: number, filename: string, fileSize: number,
+  uploadIds: number[]) => {
   try {
-    const response = await axios.post('/api/userfile/upload/session', null, {
+    const response = await axios.post('/api/userfile/upload/session',
+      {
+        uploadIds
+      }, {
       params: {
         fingerprint,
         totalChunks,
-        filename
+        filename,
+        fileSize,
       }
     });
     return response.data;
