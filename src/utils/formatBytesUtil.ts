@@ -1,7 +1,5 @@
-const formatFileSizeUtil = (bytes?: number) => {
-  if (!bytes) 
-    return;
-  
+const formatBytesUtil = (bytes: number) => {
+
   if (bytes < 1024) {
     return `${bytes} B`;
   } else if (bytes < 1024 * 1024) {
@@ -18,4 +16,4 @@ const formatFileSizeUtil = (bytes?: number) => {
     return `${(bytes / (1024 * 1024 * 1024 * 1024 * 1024 * 1024)).toFixed(1)} EB`;
   }
 };
-export default formatFileSizeUtil;
+export default formatBytesUtil;
