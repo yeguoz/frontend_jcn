@@ -10,7 +10,7 @@ import {
 import useVisibleRowsPosStore from "../../store/useVisibleRowsPosStore";
 import useFetchUserFiles from "../../hooks/useFetchUserFiles";
 import { useNavigate } from "react-router";
-import formatFileSizeUtil from "../../utils/formatFileSizeUtil";
+import formatBytesUtil from "../../utils/formatBytesUtil";
 
 const HeaderMenu = () => {
   const selectedRows = useVisibleRowsPosStore((state) => state.selectedRows);
@@ -39,7 +39,7 @@ const HeaderMenu = () => {
           <span>{name}</span>
         )}
         {selectedRows.length === 1 && type === "file" && (
-          <span>&nbsp;&nbsp;({formatFileSizeUtil(size)})</span>
+          <span>&nbsp;&nbsp;({formatBytesUtil(size)})</span>
         )}
       </div>
       <Flex gap={15}>
@@ -72,8 +72,8 @@ const Folder = () => {
     (state) => state.setEditModalType
   );
   const setShareModalVisible = useVisibleRowsPosStore(
-    (state) => state.setShareModalVisible 
-  )
+    (state) => state.setShareModalVisible
+  );
 
   const onEnterFolder = () => {
     const newPath = encodeURIComponent(path + selectedRecord?.name);
@@ -101,7 +101,7 @@ const Folder = () => {
       </div>
       <div className="icon">
         <Tooltip title="分享" arrow={false} color={"#757575"}>
-          <ShareAltOutlined className="outlinedIcon" onClick={onShare}/>
+          <ShareAltOutlined className="outlinedIcon" onClick={onShare} />
         </Tooltip>
       </div>
       <div className="icon">
@@ -191,7 +191,7 @@ const File = () => {
       </div>
       <div className="icon">
         <Tooltip title="分享" arrow={false} color={"#757575"}>
-          <ShareAltOutlined className="outlinedIcon" onClick={onShare}/>
+          <ShareAltOutlined className="outlinedIcon" onClick={onShare} />
         </Tooltip>
       </div>
       <div className="icon">
