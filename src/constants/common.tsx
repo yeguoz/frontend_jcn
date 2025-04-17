@@ -1,5 +1,5 @@
 import { Flex, GetProp, MenuProps, TableColumnsType } from "antd";
-import formatFileSizeUtil from "../utils/formatFileSizeUtil";
+import formatBytesUtil from "../utils/formatBytesUtil";
 import dateFormatUtil from "../utils/dateFormatUtil";
 import {
   FolderOpenOutlined,
@@ -23,9 +23,19 @@ const extensionToType: { [key: string]: Set<string> } = {
   excel: new Set(["xls", "xlsx"]),
   ppt: new Set(["ppt", "pptx"]),
   audio: new Set(["mp3", "flac", "wav", "aac", "ogg"]),
-  img: new Set(["jpg", "jpeg", "png", "gif", "bmp", "webp", "tiff", "svg","ico"]),
+  img: new Set([
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "bmp",
+    "webp",
+    "tiff",
+    "svg",
+    "ico",
+  ]),
   gif: new Set(["gif"]),
-  video: new Set(["mp4", "mkv", "avi", "wmv", "mov", "flv","movie"]),
+  video: new Set(["mp4", "mkv", "avi", "wmv", "mov", "flv", "movie"]),
   code: new Set([
     "tsx",
     "ts",
@@ -120,7 +130,7 @@ export const filesColumns: TableColumnsType<API.FileDTO> = [
       compare: (a, b) => a.size - b.size,
     },
     render: (value) => {
-      return value && <span>{formatFileSizeUtil(value)}</span>;
+      return value && <span>{formatBytesUtil(value)}</span>;
     },
   },
   {
@@ -141,14 +151,14 @@ export const USER = "User";
 export const ADMIN = "Admin";
 export const authItems: MenuItem[] = [
   {
-    label: <span style={{ fontSize: '1rem',marginLeft: '1rem' }}>登录</span>,
+    label: <span style={{ fontSize: "1rem", marginLeft: "1rem" }}>登录</span>,
     key: "login",
-    icon: <LoginOutlined style={{fontSize:'1rem'}}/>,
+    icon: <LoginOutlined style={{ fontSize: "1rem" }} />,
   },
   {
-    label: <span style={{ fontSize: '1rem',marginLeft: '1rem' }}>注册</span>,
+    label: <span style={{ fontSize: "1rem", marginLeft: "1rem" }}>注册</span>,
     key: "register",
-    icon: <UserAddOutlined style={{fontSize:'1rem'}}/>,
+    icon: <UserAddOutlined style={{ fontSize: "1rem" }} />,
   },
 ];
 export const homeItems: MenuItem[] = [
