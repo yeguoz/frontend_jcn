@@ -32,7 +32,7 @@ const EditModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [api, contextHolder] = notification.useNotification();
   const setData = useDataStore((state) => state.setData);
-  const { path, fetchUserFiles } = useFetchUserFiles();
+  const { pathRef, fetchUserFiles } = useFetchUserFiles();
   const [folderInputValue, setFolderInputValue] = useState(
     selectedRecord?.name
   );
@@ -71,10 +71,10 @@ const EditModal = () => {
       // 创建文件夹
       setIsLoading(true);
       try {
-        const response = await createFolder(path, folderName);
+        const response = await createFolder(pathRef.current, folderName);
         if (response.code === 200 && response.data > 0) {
           // 刷新数据
-          const filesResp = await getUserFiles(path);
+          const filesResp = await getUserFiles(pathRef.current);
           if (filesResp.data && filesResp.data.list) {
             setData(filesResp.data.list);
           }
@@ -102,10 +102,10 @@ const EditModal = () => {
       // 创建文件
       setIsLoading(true);
       try {
-        const response = await createUserFiles(path, fileName);
+        const response = await createUserFiles(pathRef.current, fileName);
         if (response.code === 200 && response.data > 0) {
           // 刷新数据
-          fetchUserFiles();
+          fetchUserFiles(pathRef.current);
         } else if (response.code >= 400) {
           api.warning({
             message: response.message,
@@ -133,7 +133,7 @@ const EditModal = () => {
         const response = await deleteUserFile(selectedRecord);
         if (response.code === 200 && response.data >= 0) {
           // 刷新数据
-          fetchUserFiles();
+          fetchUserFiles(pathRef.current);
         } else if (response.code >= 400) {
           api.warning({
             message: response.message,
@@ -163,7 +163,7 @@ const EditModal = () => {
           folderInputValue
         );
         if (response.code === 200 && response.data > 0) {
-          fetchUserFiles();
+          fetchUserFiles(pathRef.current);
         } else if (response.code >= 400) {
           api.warning({
             message: response.message,
@@ -193,7 +193,7 @@ const EditModal = () => {
           fileInputValue
         );
         if (response.code === 200 && response.data > 0) {
-          fetchUserFiles();
+          fetchUserFiles(pathRef.current);
         } else if (response.code >= 400) {
           api.warning({
             message: response.message,
