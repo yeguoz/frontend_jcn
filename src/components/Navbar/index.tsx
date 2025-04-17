@@ -4,6 +4,8 @@ import useNavStore from "../../store/useNavStore";
 import { HddOutlined } from "@ant-design/icons";
 import type { GetProp, MenuProps } from "antd";
 import StorageProgress from "../StorageProgress";
+import useAuthStore from "../../store/useAuthStore";
+
 type MenuItem = GetProp<MenuProps, "items">[number];
 
 const Navbar = ({
@@ -16,6 +18,7 @@ const Navbar = ({
   style?: React.CSSProperties;
 }) => {
   const isOpen = useNavStore((state) => state.isOpen);
+  const user = useAuthStore((state)=>state.user);
   const navigate = useNavigate();
   const childBlockDisplay = isOpen ? "block" : "none";
 
@@ -80,8 +83,8 @@ const Navbar = ({
               <span>存储空间</span>
             </div>
             <StorageProgress
-              usedStorage={782600000}
-              totalStorage={1073741824}
+              usedStorage={user?.usedStorage || 0}
+              totalStorage={user?.group.maxStorage || 0}
             />
           </div>
         </>
