@@ -4,7 +4,7 @@ import { produce } from 'immer';
 type UploadStatus = 'pending' | 'uploading' | 'handle' | 'success' | 'error';
 
 export interface UploadTask {
-  uploadId: number;
+  uploadId: string;
   filename: string;
   filesize: number;
   fingerprint: string;
@@ -17,11 +17,11 @@ export interface UploadTask {
 }
 
 type UploadStore = {
-  tasks: Record<number, UploadTask>; // uploadId -> task
+  tasks: Record<string, UploadTask>; // uploadId -> task
   addTask: (task: UploadTask) => void;
-  removeTask: (uploadId: number) => void;
-  updateTask: (uploadId: number, updater: (task: UploadTask) => void) => void;
-  getUploadedBytes: (uploadId: number) => number;
+  removeTask: (uploadId: string) => void;
+  updateTask: (uploadId: string, updater: (task: UploadTask) => void) => void;
+  getUploadedBytes: (uploadId: string) => number;
   removeTasksByStatus: (status: UploadStatus) => void;
   getCompletedCount: () => number;
 };
@@ -72,7 +72,7 @@ const useUploadStore = create<UploadStore>((set, get) => ({
       const tasks = get().tasks;
       let count = 0;
       Object.keys(tasks).forEach((key) => {
-        if (tasks[Number(key)].completed) count++;
+        if (tasks[key].completed) count++;
       });
       return count;
     },
