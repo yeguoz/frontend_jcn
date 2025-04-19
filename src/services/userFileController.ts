@@ -100,19 +100,20 @@ export const previewFile = async (filePath: string) => {
 }
 
 export const fetchUploadSession = async (fingerprint: string, totalChunks: number, filename: string, fileSize: number,
-  uploadIds: number[]) => {
+  uploadIds: string[]) => {
   try {
     const response = await axios.post('/api/userfile/upload/session',
       {
         uploadIds
-      }, {
-      params: {
-        fingerprint,
-        totalChunks,
-        filename,
-        fileSize,
-      }
-    });
+      },
+      {
+        params: {
+          fingerprint,
+          totalChunks,
+          filename,
+          fileSize,
+        }
+      });
     return response.data;
   } catch (error) {
     console.error('获取上传会话错误:', error);
@@ -144,18 +145,20 @@ export const fetchChunksStatus = async (fingerprint: string) => {
 }
 
 export const uploadChunk = async (
-  uploadId: number,
+  uploadId: string,
   fingerprint: string,
   md5: string,
   chunk: Blob,
   filename: string,
   chunkIndex: number,
   totalChunks: number,
-  updateTask: (uploadId: number, updater: (task: UploadTask) => void) => void,
+  uploadIds: string[],
+  fileSize: number,
+  updateTask: (uploadId: string, updater: (task: UploadTask) => void) => void,
 ) => {
   let lastTime = Date.now();
   let lastUploadedBytes = 0;
-  const speedHistory: Record<number, number[]> = {};
+  const speedHistory: Record<string, number[]> = {};
   if (!speedHistory[uploadId]) speedHistory[uploadId] = [];
 
   const formData = new FormData();
@@ -163,6 +166,8 @@ export const uploadChunk = async (
   formData.append("md5", md5);
   formData.append("chunk", chunk);
   formData.append("totalChunks", totalChunks.toString());
+  formData.append("uploadRequest", JSON.stringify({ uploadIds: uploadIds }));
+  formData.append("fileSize", fileSize.toString());
 
   try {
     const response = await axios.post(`/api/userfile/upload/chunk/${uploadId}/${filename}/${chunkIndex}`, formData, {
@@ -207,7 +212,7 @@ export const uploadChunk = async (
 
 export const mergeChunks = async (
   path: string,
-  uploadId: number,
+  uploadId: string,
   fingerprint: string,
   size: number,
   filename: string,
