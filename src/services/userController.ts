@@ -104,4 +104,11 @@ export const uploadAvatar = async (file: File) => {
   }
 }
 
-
+export const fetchUsers = async () => {
+  try {
+    const response = await axios.get('/api/users/admin');
+    return response.data;
+  } catch (error) {
+    console.error('获取所有用户错误:', error);
+  }
+}
