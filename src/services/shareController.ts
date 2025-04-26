@@ -34,3 +34,12 @@ export const fetchSharedFile = async (shortId: string, password?: string, path?:
     console.error('获取共享文件错误:', error);
   }
 };
+
+export const fetchSharedFiles = async () => {
+  try {
+    const response = await axios.get('/api/s/admin');
+    return response.data;
+  } catch (error) {
+    console.error('获取所有用户错误:', error);
+  }
+}
