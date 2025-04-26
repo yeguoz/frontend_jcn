@@ -28,18 +28,6 @@ export const createUserFiles = async (path: string, filename: string) => {
   }
 }
 
-export const deleteUserFile = async (body: API.FileDTO | null) => {
-  try {
-    const response = await axios.delete('/api/userfile', {
-      data: body
-    });
-    return response.data;
-  } catch (error) {
-    console.error('用户文件删除错误:', error);
-  }
-}
-
-
 export const fetchDownloadFile = async (filePath: string, shortId?: string) => {
   try {
     const response = await axios.get('/api/userfile/download/file', {
@@ -233,5 +221,58 @@ export const mergeChunks = async (
     return response.data;
   } catch (error) {
     console.error(`合并分片错误:`, error);
+  }
+}
+
+export const fetchUserFiles = async () => {
+  try {
+    const response = await axios.get('/api/userfile/admin');
+    return response.data;
+  } catch (error) {
+    console.error('获取所有用户错误:', error);
+  }
+}
+
+export const moveUserFile = async (userFileId: number, targetFolderId: number) => {
+  try {
+    const response = await axios.put('/api/userfile/move', null, {
+      params: {
+        userFileId,
+        targetFolderId
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('移动用户文件错误:', error);
+  }
+};
+
+export const copyUserFile = async (fileSize: number, userFileId: number, targetFolderId: number, uploadIds: string[]) => {
+  try {
+    const response = await axios.post('/api/userfile/copy',
+      {
+        uploadIds
+      },
+      {
+        params: {
+          fileSize,
+          userFileId,
+          targetFolderId
+        }
+      });
+    return response.data;
+  } catch (error) {
+    console.error('复制用户文件错误:', error);
+  }
+};
+
+export const deleteUserFile = async (userFileId: number, fileId: number, fileSize: number) => {
+  try {
+    const response = await axios.delete('/api/userfile', {
+      params: { userFileId, fileId, fileSize }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('删除用户文件错误:', error);
   }
 }
