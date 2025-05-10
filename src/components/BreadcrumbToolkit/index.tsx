@@ -16,10 +16,11 @@ const BreadcrumbToolkit = () => {
     (state) => state.setSelectedRows
   );
   const { path, fetchUserFiles, pathRef } = useFetchUserFiles();
-
   // 通过items渲染面包屑
   function itemRender(
-    currentRoute: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>,
+    currentRoute: Partial<
+      BreadcrumbItemType & BreadcrumbSeparatorType & { search: boolean }
+    >,
     _0: object,
     _1: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>[],
     paths: string[]
@@ -27,11 +28,33 @@ const BreadcrumbToolkit = () => {
     const onClick = async () => {
       const currentPath =
         paths[paths.length - 1] === "" ? "/" : paths[paths.length - 1];
+      const previousPath =
+        paths[paths.length - 2] === "" ? "/" : paths[paths.length - 2];
       if (currentPath === currentRoute.path) {
         fetchUserFiles(pathRef.current);
+      } else if (previousPath === currentRoute.path) {
+        fetchUserFiles(pathRef.current);
+        setItems([{ path: "/", name: "/", search: false }]);
       }
       setSelectedRows([]);
     };
+
+    if (currentRoute.search) {
+      return (
+        <Link
+          to={`/home?path=${encodeURIComponent(pathRef.current)}`}
+          style={{
+            padding: "0 16px",
+            height: "40px",
+            lineHeight: "40px",
+            borderRadius: "10px",
+            cursor: "pointer",
+          }}
+        >
+          {currentRoute.path}
+        </Link>
+      );
+    }
 
     return (
       <Link
@@ -51,16 +74,16 @@ const BreadcrumbToolkit = () => {
 
   useEffect(() => {
     // 路径变化时更新面包屑 并获取文件列表
-    const breadcrumbItems = [{ path: "/", name: "/" }];
+    const breadcrumbItems = [{ path: "/", name: "/", search: false }];
     path
       .split("/")
       .filter((item) => item !== "")
       .map((item) => {
-        breadcrumbItems.push({ path: item, name: item });
+        breadcrumbItems.push({ path: item, name: item, search: false });
       });
     setItems(breadcrumbItems);
     fetchUserFiles(pathRef.current);
-  }, [path, setItems, fetchUserFiles, pathRef]);
+  }, [pathRef.current]);
 
   return (
     <Flex
