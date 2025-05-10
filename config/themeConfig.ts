@@ -30,6 +30,7 @@ const lightTheme = {
       subMenuItemBg: "#fff",
       itemSelectedBg: "#fff",
       iconMarginInlineEnd: 15,
+      itemBg: "#fff",
     },
     Table: {
       headerBg: "#fafafa",
