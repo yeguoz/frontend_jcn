@@ -6,7 +6,6 @@ import {
   EditOutlined,
   EnterOutlined,
   ExportOutlined,
-  InfoCircleOutlined,
   ShareAltOutlined,
 } from "@ant-design/icons";
 import styles from "./index.module.css";
@@ -14,6 +13,7 @@ import useVisibleRowsPosStore from "../../store/useVisibleRowsPosStore";
 import Item from "./Item";
 import { useNavigate } from "react-router";
 import useFetchUserFiles from "../../hooks/useFetchUserFiles";
+import { fetchDownloadFile } from "../../services/userFileController";
 
 const ItemContextMenu = React.forwardRef<
   HTMLDivElement,
@@ -66,6 +66,12 @@ const FolderContextMenu = () => {
   const setShareModalVisible = useVisibleRowsPosStore(
     (state) => state.setShareModalVisible
   );
+  const setTreeModalVisible = useVisibleRowsPosStore(
+    (state) => state.setTreeModalVisible
+  );
+  const setTreeModalType = useVisibleRowsPosStore(
+    (state) => state.setTreeModalType
+  );
 
   // 进入文件夹
   const onEnterFolder = () => {
@@ -93,6 +99,18 @@ const FolderContextMenu = () => {
     setShareModalVisible(true);
   };
 
+  const onCopy = () => {
+    setItemCtxMenuVisible?.(false);
+    setTreeModalVisible(true);
+    setTreeModalType("copy");
+  };
+
+  const onMove = () => {
+    setItemCtxMenuVisible?.(false);
+    setTreeModalVisible(true);
+    setTreeModalType("move");
+  };
+
   return (
     <>
       <Item
@@ -100,17 +118,14 @@ const FolderContextMenu = () => {
         title={"进入文件夹"}
         onClick={onEnterFolder}
       />
-      {/* <Item icon={<CloudDownloadOutlined />} title={"打包下载"} /> */}
-      {/* <Item icon={<ZipIcon />} title={"压缩"} /> */}
       <Item
         icon={<ShareAltOutlined />}
         title={"创建分享链接"}
         onClick={onShare}
       />
-      <Item icon={<InfoCircleOutlined />} title={"详细信息"} />
       <Item icon={<EditOutlined />} title={"重命名"} onClick={onRename} />
-      <Item icon={<CopyOutlined />} title={"复制"} />
-      <Item icon={<ExportOutlined />} title={"移动"} />
+      <Item icon={<CopyOutlined />} title={"复制"} onClick={onCopy} />
+      <Item icon={<ExportOutlined />} title={"移动"} onClick={onMove} />
       <Item icon={<DeleteOutlined />} title={"删除"} onClick={onDelete} />
     </>
   );
@@ -135,22 +150,21 @@ const FileContextMenu = () => {
   const setShareModalVisible = useVisibleRowsPosStore(
     (state) => state.setShareModalVisible
   );
+  const setTreeModalVisible = useVisibleRowsPosStore(
+    (state) => state.setTreeModalVisible
+  );
+  const setTreeModalType = useVisibleRowsPosStore(
+    (state) => state.setTreeModalType
+  );
 
   const onDelete = () => {
-    setEditModalType("deleteFile");
+    setEditModalType("delete");
     setEditModalVisible(true);
     setItemCtxMenuVisible(false);
   };
 
-  const downloadFile = async () => {
-    const url = `/api/${selectedRecord?.sourceName}`;
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = selectedRecord?.name as string;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
+  const downloadFile = () => {
+    fetchDownloadFile(selectedRecord?.sourceName as string);
     setSelectedRows([]);
     setItemCtxMenuVisible?.(false);
   };
@@ -166,6 +180,18 @@ const FileContextMenu = () => {
     setShareModalVisible(true);
   };
 
+  const onCopy = () => {
+    setItemCtxMenuVisible?.(false);
+    setTreeModalVisible(true);
+    setTreeModalType("copy");
+  };
+
+  const onMove = () => {
+    setItemCtxMenuVisible?.(false);
+    setTreeModalVisible(true);
+    setTreeModalType("move");
+  };
+
   return (
     <>
       <Item icon={<EnterOutlined />} title={"打开文件"} />
@@ -174,16 +200,14 @@ const FileContextMenu = () => {
         title={"下载文件"}
         onClick={downloadFile}
       />
-      {/* <Item icon={<ZipIcon />} title={"压缩"} /> */}
       <Item
         icon={<ShareAltOutlined />}
         title={"创建分享链接"}
         onClick={onShare}
       />
-      <Item icon={<InfoCircleOutlined />} title={"详细信息"} />
       <Item icon={<EditOutlined />} title={"重命名"} onClick={onRename} />
-      <Item icon={<CopyOutlined />} title={"复制"} />
-      <Item icon={<ExportOutlined />} title={"移动"} />
+      <Item icon={<CopyOutlined />} title={"复制"} onClick={onCopy} />
+      <Item icon={<ExportOutlined />} title={"移动"} onClick={onMove} />
       <Item icon={<DeleteOutlined />} title={"删除"} onClick={onDelete} />
     </>
   );
