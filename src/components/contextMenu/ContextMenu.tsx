@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  CloudDownloadOutlined,
   CloudUploadOutlined,
   FileAddOutlined,
   FolderAddOutlined,
@@ -89,7 +88,6 @@ const ContextMenu = React.forwardRef<
             dirUploadInputRef.current?.click();
           }}
         />
-        <Item icon={<CloudDownloadOutlined />} title={"离线下载"} />
         <Item
           icon={<FolderAddOutlined />}
           title={"创建文件夹"}
