@@ -1,10 +1,10 @@
 import useUploadStore from "../../../store/useUploadStore";
 import { Avatar, List, Progress, theme } from "antd";
 import { getFileType } from "../../../constants/common";
-import formatBytesUtil from "../../../utils/formatBytesUtil";
+import { formatBytesUtil } from "../../../utils/formatUtil";
 
 const { useToken } = theme;
-const UploadTaskItem = ({ uploadId }: { uploadId: number }) => {
+const UploadTaskItem = ({ uploadId }: { uploadId: string }) => {
   const task = useUploadStore((state) => state.tasks[uploadId]);
   const getUploadedBytes = useUploadStore((state) => state.getUploadedBytes);
 
