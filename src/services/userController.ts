@@ -68,15 +68,6 @@ export const getCaptcha = async (captchaType: string) => {
   }
 }
 
-// 获取session id
-export const getSessionId = async () => {
-  try {
-    const response = await axios.get('/api/users/session');
-    return response.data;
-  } catch (error) {
-    console.error('获取session id错误:', error);
-  }
-}
 
 export const updatePersonInfo = async ({ nickname, password }: { nickname?: string, password?: string }) => {
   try {
@@ -104,11 +95,31 @@ export const uploadAvatar = async (file: File) => {
   }
 }
 
-export const fetchUsers = async () => {
+export const verifyEmail = async (id: number, token: string) => {
   try {
-    const response = await axios.get('/api/users/admin');
+    const response = await axios.put('/api/users/verify/register', null, { params: { id, token } });
     return response.data;
   } catch (error) {
-    console.error('获取所有用户错误:', error);
+    console.error('验证失败:', error);
+  }
+}
+
+export const fetchForgetPwd = async (email: string) => {
+  try {
+    const response = await axios.post('/api/users/forget', null, { params: { email } });
+    return response.data;
+  } catch (error) {
+    console.error('请求忘记密码失败:', error);
+  }
+}
+
+export const resetPwd = async (email: string, token: string, password: string, checkPassword: string) => {
+  try {
+    const response = await axios.put('/api/users/reset/pwd',
+      { password, checkPassword },
+      { params: { email, token } });
+    return response.data;
+  } catch (error) {
+    console.error('重置密码失败:', error);
   }
 }
