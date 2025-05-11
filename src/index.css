@@ -11,29 +11,17 @@
   padding: 0;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
+html,
 body {
   margin: 0;
   padding: 0;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 ul {
   list-style-type: none;
-}
-
-@media (max-width: 1200px) {
-  html { font-size: 14px; }
-}
-
-@media (max-width: 768px) {
-  html { font-size: 12px; }
-}
-
-@media (max-width: 480px) {
-  html { font-size: 10px; }
 }
