@@ -15,8 +15,9 @@ interface FormValues {
   captcha?: string;
 }
 const { useToken } = theme;
+
 const Login: React.FC = () => {
-  const settings = useSettingStore((state) => state.settings);
+  const authSettings = useSettingStore((state) => state.authSettings);
   const setUser = useAuthStore((state) => state.setUser);
   const setIsAuth = useAuthStore((state) => state.setIsAuth);
   const setIsOpen = useNavStore((state) => state.setIsOpen);
@@ -28,10 +29,15 @@ const Login: React.FC = () => {
     const { email, password, captcha } = values;
     const userResult = await login(email, password, captcha);
 
-    if (userResult.data) {
-      setUser(userResult.data);
-      setIsAuth(true);
-      setIsOpen(true);
+    if (userResult.code === 200 && userResult.data) {
+      api.success({
+        message: userResult.message,
+      });
+      setTimeout(() => {
+        setUser(userResult.data);
+        setIsAuth(true);
+        setIsOpen(true);
+      }, 1000);
     } else {
       api.warning({
         message: userResult.message,
@@ -48,10 +54,10 @@ const Login: React.FC = () => {
   };
 
   useEffect(() => {
-    if (settings?.login_captcha) {
+    if (authSettings?.get("loginCaptcha")) {
       fetchCaptcha();
     }
-  }, [settings]);
+  }, [authSettings]);
 
   return (
     <>
@@ -109,7 +115,7 @@ const Login: React.FC = () => {
             className="inputHeight"
           />
         </Form.Item>
-        {settings?.login_captcha == "true" && (
+        {authSettings?.get("loginCaptcha") == "true" && (
           <Form.Item name="captcha" rules={[{ required: false, message: "!" }]}>
             <Input
               placeholder="请输入验证码"
@@ -134,7 +140,7 @@ const Login: React.FC = () => {
         <Form.Item>
           <Flex justify="space-between" align="center">
             <NavLink to="/forget">忘记密码</NavLink>
-            {settings?.register_enabled == "true" && (
+            {authSettings?.get("registerEnabled") == "true" && (
               <NavLink to="/register">注册账号</NavLink>
             )}
           </Flex>
