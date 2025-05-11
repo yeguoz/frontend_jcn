@@ -1,20 +1,13 @@
 import { create } from "zustand";
 
-type AuthSetting = {
-  login_captcha: string;
-  register_captcha: string;
-  register_enabled: string;
-  register_group: string;
-}
-
 interface SettingStore {
-  settings: AuthSetting | null;
-  setSettings: (settings: AuthSetting) => void;
+  authSettings: Map<string, string> | null;
+  setAuthSettings: (settings: Map<string, string>) => void;
 }
 
 const useSettingStore = create<SettingStore>((set) => ({
-  settings: null,
-  setSettings: (settings) => set({ settings }),
+  authSettings: null,
+  setAuthSettings: (settings) => set({ authSettings: settings }),
 }));
 
 export default useSettingStore;
