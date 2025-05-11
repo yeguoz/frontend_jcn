@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type BreadcrumbItems = { path: string, name: string };
+type BreadcrumbItems = { path: string, name: string, search: boolean };
 
 interface BreadcrumbStore {
   items: BreadcrumbItems[];
@@ -14,12 +14,12 @@ function getInitialItems() {
   if (path === null || path === "") {
     path = "/";
   }
-  const breadcrumbItems = [{ path: "/", name: "/" }];
+  const breadcrumbItems = [{ path: "/", name: "/", search: false }];
   path
     .split("/")
     .filter((item) => item !== "")
     .map((item) => {
-      breadcrumbItems.push({ path: item, name: item });
+      breadcrumbItems.push({ path: item, name: item, search: false });
     });
   return breadcrumbItems;
 }
@@ -27,7 +27,7 @@ function getInitialItems() {
 const useBreadcrumbStore = create<BreadcrumbStore>((set) => ({
   items: getInitialItems(),
   setNewItem: (newItem) => set((state) => ({ items: [...state.items, newItem] })),
-  setItems: (newItems) => set({ items: newItems })
+  setItems: (newItems) => set({ items: newItems }),
 }));
 
 export default useBreadcrumbStore;
