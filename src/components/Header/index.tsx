@@ -21,7 +21,7 @@ import useAuthStore from "../../store/useAuthStore";
 import useNavStore from "../../store/useNavStore";
 import DataTransferIcon from "../icon/DataTransferIcon";
 import { logout } from "../../services/userController";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ADMIN,
   adminItems,
@@ -32,6 +32,9 @@ import { useWorkerStore } from "../../store/useWorkerStore";
 import UploadQueue from "./components/UploadQueue";
 import useUploadStore from "../../store/useUploadStore";
 import useBreadcrumbStore from "../../store/useBreadcrumbStore";
+import { debounce, throttle } from "lodash";
+import { searchUserFile } from "../../services/userFileController";
+import useDataStore from "../../store/useDataStore";
 
 const { useToken } = theme;
 const Header = () => {
@@ -46,6 +49,12 @@ const Header = () => {
   const setUser = useAuthStore((state) => state.setUser);
   const user = useAuthStore((state) => state.user);
   const setIsAuth = useAuthStore((state) => state.setIsAuth);
+  const setData = useDataStore((state) => state.setData);
+  const [keyword, setKeyword] = useState("");
+  const url = import.meta.env.PROD
+    ? `${import.meta.env.BASE_URL}/api/users/avatar?filePath=${user?.avatar}`
+    : `/api/users/avatar?filePath=${user?.avatar}`;
+
   const completedCount = useUploadStore((state) =>
     Object.values(state.tasks).reduce(
       (count, task) => (task.completed ? count + 1 : count),
@@ -77,7 +86,7 @@ const Header = () => {
     } else if (key === "person") {
       navigate("/person");
     } else if (key === "admin") {
-      navigate("/admin");
+      navigate("/admin/setting/site");
     }
   };
 
@@ -91,6 +100,31 @@ const Header = () => {
       setOpen(true);
     }
   }, [tasksCount]);
+
+  const searchRef = useRef(
+    debounce(
+      throttle(async (keyword: string) => {
+        const res = await searchUserFile(keyword);
+        setData(res.data.list);
+        setItems([
+          { path: "/", name: "/", search: false },
+          {
+            path: `搜索结果`,
+            name: `搜索结果`,
+            search: true,
+          },
+        ]);
+      }, 1000),
+      500
+    )
+  );
+
+  const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const keyword = event.currentTarget.value;
+    searchRef.current(keyword);
+    setKeyword("");
+    navigate(`/home`);
+  };
 
   return (
     <Flex
@@ -124,7 +158,7 @@ const Header = () => {
           }}
           onClick={() => {
             if (isAuth) {
-              setItems([{ path: "/", name: "/" }]);
+              setItems([{ path: "/", name: "/", search: false }]);
             }
           }}
         >
@@ -135,9 +169,9 @@ const Header = () => {
           prefix={<SearchOutlined />}
           size="large"
           variant="filled"
-          onPressEnter={() => {
-            alert(1);
-          }}
+          onPressEnter={handleSearch}
+          onChange={(e) => setKeyword(e.target.value)}
+          value={keyword}
         />
       </Flex>
       {/* 右侧 */}
@@ -196,7 +230,7 @@ const Header = () => {
                     >
                       <Avatar
                         size="large"
-                        src={`/api/${user?.avatar}`}
+                        src={url}
                         icon={<UserOutlined />}
                         shape="square"
                       />
@@ -219,7 +253,7 @@ const Header = () => {
               }}
             >
               {user?.avatar ? (
-                <Avatar size="large" src={`/api/${user?.avatar}`} />
+                <Avatar size="large" src={url} />
               ) : (
                 <UserOutlined className="outlinedIcon" />
               )}
