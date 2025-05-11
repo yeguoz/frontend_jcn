@@ -1,10 +1,4 @@
-import {
-  Flex,
-  FloatButton,
-  notification,
-  Skeleton,
-  Table,
-} from "antd";
+import { Flex, FloatButton, notification, Skeleton, Table } from "antd";
 import BreadcrumbToolkit from "../../components/BreadcrumbToolkit";
 import { useEffect, useRef } from "react";
 import {
@@ -15,7 +9,7 @@ import {
   uploadChunk,
 } from "../../services/userFileController";
 import useDataStore from "../../store/useDataStore";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import HeaderMenu from "../../components/HeaderMenu";
 import ContextMenu from "../../components/contextMenu/ContextMenu";
 import ItemContextMenu from "../../components/contextMenu/ItemContextMenu";
@@ -35,10 +29,13 @@ import useUploadStore from "../../store/useUploadStore";
 import { useWorkerStore } from "../../store/useWorkerStore";
 import { debounce, throttle } from "lodash";
 import useBreadcrumbStore from "../../store/useBreadcrumbStore";
+import TreeModal from "../../components/TreeModal";
+import useFetchUser from "../../hooks/useFetchUser";
 
 export const Home = () => {
   const navigate = useNavigate();
-  const { data } = useDataStore((state) => state);
+  const location = useLocation();
+  const data = useDataStore((state) => state.data);
   const { items, setNewItem } = useBreadcrumbStore((state) => state);
   const { tableIsLoading, setTableIsLoading } = useLoadingStore(
     (state) => state
@@ -58,6 +55,7 @@ export const Home = () => {
     setSelectedRecord,
   } = useVisibleRowsPosStore((state) => state);
 
+  const tasks = useUploadStore((state) => state.tasks);
   const addTask = useUploadStore((state) => state.addTask);
   const updateTask = useUploadStore((state) => state.updateTask);
 
@@ -68,9 +66,17 @@ export const Home = () => {
   const fileUploadInputRef = useRef<HTMLInputElement | null>(null);
   const dirUploadInputRef = useRef<HTMLInputElement | null>(null);
   const [api, contextHolder] = notification.useNotification();
-
+  const { debouncedFetchCurrentUser } = useFetchUser();
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
+
+  // 监听路由变化
+  useEffect(() => {
+    setSelectedRows([]);
+    setCtxMenuVisible(false);
+    setItemCtxMenuVisible(false);
+    setMultipleMenuVisible(false);
+  }, [location.key]);
 
   const handleCtxMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -106,7 +112,7 @@ export const Home = () => {
     }
 
     if (selectedRows.includes(record) && selectedRows.length > 1) {
-      // 当前是选择rows中一行
+      // 选择rows中一行
       setCtxMenuVisible(false);
       setItemCtxMenuVisible(false);
       setMultipleMenuVisible(true);
@@ -175,14 +181,15 @@ export const Home = () => {
     }
     const fileList = Array.from(files);
     e.target.value = "";
-
     const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
 
     const uploadTasks: {
       file: File;
-      uploadId: number;
+      uploadId: string;
       fingerprint: string;
     }[] = [];
+
+    const uploadIds: string[] = [];
 
     for (const file of fileList) {
       try {
@@ -200,7 +207,7 @@ export const Home = () => {
         if (file.size == 0) {
           const errorId = Date.now();
           addTask({
-            uploadId: errorId,
+            uploadId: errorId.toString(),
             filename: file.name,
             filesize: file.size,
             fingerprint,
@@ -212,15 +219,27 @@ export const Home = () => {
           continue;
         }
 
+        // 将任务队列中任务id push
+        for (const key in tasks) {
+          const task = tasks[key];
+          if (task?.status !== "error" && task?.status !== "success") {
+            uploadIds.push(task.uploadId);
+          }
+        }
+
         // 请求上传会话
         const response = await fetchUploadSession(
           fingerprint,
           totalChunks,
-          file.name
+          file.name,
+          file.size,
+          uploadIds
         );
+
+        let uploadId: string = "";
         // 添加上传队列中
         if (response.code === 200 && response.data) {
-          const uploadId: number = response.data;
+          uploadId = response.data;
           addTask({
             uploadId,
             filename: file.name,
@@ -231,11 +250,13 @@ export const Home = () => {
             message: "等待上传...",
             bytes: {},
           });
+          // 将新任务id push到数组
+          uploadIds.push(uploadId);
           uploadTasks.push({ file, uploadId, fingerprint });
         } else {
           const errorId = Date.now();
           addTask({
-            uploadId: errorId,
+            uploadId: errorId.toString(),
             filename: file.name,
             filesize: file.size,
             fingerprint,
@@ -249,7 +270,7 @@ export const Home = () => {
         console.error("预处理错误:", error);
       }
     }
-    
+
     // 所有文件预处理完成后统一上传
     await Promise.all(
       uploadTasks.map(async ({ file, uploadId, fingerprint }) => {
@@ -257,7 +278,8 @@ export const Home = () => {
           file,
           uploadId,
           fingerprint,
-          file.webkitRelativePath
+          file.webkitRelativePath,
+          uploadIds
         );
       })
     );
@@ -265,9 +287,10 @@ export const Home = () => {
 
   const uploadFileInChunks = async (
     file: File,
-    uploadId: number,
+    uploadId: string,
     fingerprint: string,
-    webkitRelativePath: string
+    webkitRelativePath: string,
+    uploadIds: string[]
   ) => {
     const CHUNK_SIZE = 4 * 1024 * 1024;
     const CONCURRENT_LIMIT = 3; // 最大并发数
@@ -281,6 +304,9 @@ export const Home = () => {
     const mergeCompleted = chunksStatusResp.data;
     if (uploadedChunks.length === totalChunks && !mergeCompleted) {
       console.log("文件分片已上传完成,开始合并分片");
+      updateTask(uploadId, (task) => {
+        task.progress = 100;
+      });
       // 合并分片
       handleMergeChunks(
         uploadId,
@@ -338,6 +364,8 @@ export const Home = () => {
             file.name,
             chunkIndex,
             totalChunks,
+            uploadIds,
+            file.size,
             updateTask
           );
 
@@ -373,11 +401,12 @@ export const Home = () => {
   };
 
   // 先用 throttle 包一层
-  const throttled = throttle(fetchUserFiles, 1000); // 最多1秒触发一次
+  const throttledFetchUserFiles = throttle(fetchUserFiles, 1000); // 最多1秒触发一次
   // 再在节流上防抖包一层
-  const throttledThenDebounced = debounce(throttled, 500);
+  const debouncedFetchUserFiles = debounce(throttledFetchUserFiles, 500);
+
   const handleMergeChunks = async (
-    uploadId: number,
+    uploadId: string,
     fingerprint: string,
     filesize: number,
     filename: string,
@@ -399,12 +428,13 @@ export const Home = () => {
       webkitRelativePath
     );
     if (mergeResp.code === 200) {
-      throttledThenDebounced(pathRef.current);
       updateTask(uploadId, (task) => {
         task.message = mergeResp.message;
         task.status = "success";
         task.completed = true;
       });
+      debouncedFetchUserFiles(pathRef.current);
+      debouncedFetchCurrentUser();
     } else if (mergeResp.code > 200) {
       updateTask(uploadId, (task) => {
         task.message = mergeResp.message;
@@ -421,7 +451,7 @@ export const Home = () => {
   return (
     <Flex style={{ flex: 1, overflow: "hidden" }}>
       {contextHolder}
-      <Navbar menuItems={homeItems} showStorage />
+      <Navbar showStorage menuItems={homeItems} optionOpen />
       <div
         style={{
           userSelect: "none",
@@ -448,43 +478,28 @@ export const Home = () => {
                 type: "checkbox",
                 columnWidth: 40,
                 selectedRowKeys: selectedRows.map((item) => item.id),
-                onSelectMultiple: (_, selectedRows) => {
-                  console.log("onSelectMultiple", selectedRows);
-                },
                 onChange: (_, selectedRows) => {
                   setCtxMenuVisible(false);
                   setItemCtxMenuVisible(false);
                   setMultipleMenuVisible(false);
                   setSelectedRows(selectedRows);
-                  // TODO多选处理 显示菜单
                   if (
                     selectedRows.length <= 1 &&
                     selectedRows[0]?.type === "folder"
                   ) {
-                    // TODO 单选文件夹 显示菜单
-                    console.log("选中文件夹selectedRows", selectedRows);
                     setSelectedRecord(selectedRows[0]);
                   }
                   if (
                     selectedRows.length <= 1 &&
                     selectedRows[0]?.type === "file"
                   ) {
-                    // TODO 单选文件 显示菜单
-                    console.log("选中文件selectedRows", selectedRows);
                     setSelectedRecord(selectedRows[0]);
                   }
                 },
               }}
-              locale={{ emptyText: "no data" }}
               onRow={(record) => {
                 return {
-                  // TODO操作菜单两种类型，类型1：右键目录或文件，类型2：右键其他位置
-                  // TODO单击选中文件或目录，弹出操作菜单
                   onClick: async () => {
-                    // 文件处理
-                    // if (record.type === "file") {
-                    // navigate(`/preview?filePath=${encodeURIComponent(record.sourceName)}`);
-                    // }
                     // 文件夹处理
                     if (record.type === "folder") {
                       setTableIsLoading(true);
@@ -492,6 +507,7 @@ export const Home = () => {
                       setNewItem({
                         path: record.name,
                         name: record.name,
+                        search: false,
                       });
                       // 发送请求
                       let url = "/";
@@ -503,7 +519,6 @@ export const Home = () => {
                       url += record.name;
                       // 设置URL路径
                       navigate(`?path=${encodeURIComponent(url)}`);
-                      // 清空选中行
                       setSelectedRows([]);
                       setTableIsLoading(false);
                     }
@@ -512,24 +527,19 @@ export const Home = () => {
                     if (record.type === "file") {
                       setSelectedRows([]);
                       navigate(
-                        `/preview?filePath=${encodeURIComponent(
-                          record.sourceName
-                        )}&filename=${encodeURIComponent(record.name)}`
+                        `/preview?filename=${encodeURIComponent(record.name)}`,
+                        {
+                          state: {
+                            filePath: `${encodeURIComponent(
+                              record.sourceName
+                            )}`,
+                          },
+                        }
                       );
                     }
                   },
-                  // 右键弹出操作菜单
                   onContextMenu: (event) => {
-                    console.log("右键元素：", record);
                     handleItemCtxMenu(event, record);
-                  },
-                };
-              }}
-              onHeaderRow={(column, index) => {
-                return {
-                  // 右击列头，弹出操作菜单
-                  onContextMenu: () => {
-                    console.log("右击列头", column, index);
                   },
                 };
               }}
@@ -547,6 +557,7 @@ export const Home = () => {
         {multipleMenuVisible && <MultipleMenu ref={multipleMenuMenuRef} />}
         <EditModal />
         <ShareModal />
+        <TreeModal />
         <FloatButton.Group
           trigger="hover"
           type="primary"
@@ -586,15 +597,6 @@ export const Home = () => {
           } as React.InputHTMLAttributes<HTMLInputElement>)}
         />
       </div>
-      {/* <Button
-        onClick={() => {
-          const buf = new TextEncoder().encode("hello world").buffer;
-          console.log(SparkMD5.ArrayBuffer.hash(buf));
-          console.log(import.meta.url);
-        }}
-      >
-        按钮
-      </Button> */}
     </Flex>
   );
 };
