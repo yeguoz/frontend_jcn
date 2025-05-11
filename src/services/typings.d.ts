@@ -80,12 +80,12 @@ declare namespace API {
     sourceId: number;
     userFileId: number;
     passwordEnabled: boolean;
-    password: string|null;
+    password: string | null;
     isDir: number;
-    downloadCount: number;
+    remainingDownloads: number;
     previewEnabled: boolean;
     expireTimeEnabled: boolean;
-    expireTime: Date|null;
+    expireTime: string | null;
   }
 
   type ShareVO = {
@@ -97,7 +97,7 @@ declare namespace API {
     isDir: boolean;
     previewEnabled: boolean;
     visitCount: number;
-    downloadCount: number;
+    remainingDownloads: number;
     list: FileDTO[];
     createdAt: Date;
   }
@@ -105,8 +105,47 @@ declare namespace API {
   type ShareInfoVO = {
     userVO: UserVO;
     passwordEnabled: boolean;
-    isDir: boolean ;
+    isDir: boolean;
     sourceName: string;
     createdAt: Date;
   }
+
+  type FolderDTO = {
+    id: number;
+    userId: number;
+    name: string;
+    parentId: number;
+    createdAt: Date;
+  }
+
+  type SubFolderVO = {
+    currentId: number;
+    parentId: number;
+    list: FolderDTO[];
+  }
+
+  type SettingVO = {
+    id: number;
+    type: string;
+    name: string;
+    value: string;
+  }
+
+  type MyShareVO = {
+    id: number;
+    sourceId: number;
+    userFileId: number;
+    shortId: string;
+    sourceName: string;
+    passwordEnabled: number;
+    password: string;
+    isDir: number;
+    visitCount: number;
+    remainingDownloads: number;
+    previewEnabled: number;
+    expireTimeEnabled: number;
+    expireTime: Date;
+    createdAt: Date;
+    fileName: string;
+  };  
 }
