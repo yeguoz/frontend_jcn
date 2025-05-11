@@ -15,7 +15,7 @@ const ShareFile = () => {
   const [fileType, setFileType] = useState<string | undefined>(undefined);
   const [api, contextHolder] = notification.useNotification();
   const url = import.meta.env.PROD
-    ? ""
+    ? `${import.meta.env.BASE_URL}/api/users/avatar?filePath=${data?.userVO?.avatar}`
     : `/api/users/avatar?filePath=${data?.userVO?.avatar}`;
 
   const handlePreview = () => {
