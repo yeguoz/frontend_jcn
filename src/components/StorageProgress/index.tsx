@@ -1,6 +1,6 @@
 import React from "react";
 import { Progress, theme } from "antd";
-import formatBytesUtil from "../../utils/formatBytesUtil";
+import { formatBytesUtil } from "../../utils/formatUtil";
 
 interface StorageProgressProps {
   usedStorage: number; // 已使用的存储量
