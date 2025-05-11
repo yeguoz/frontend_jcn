@@ -1,6 +1,10 @@
 import { Modal, Form, Input, notification } from "antd";
 import { useEffect, useState } from "react";
-import { createFolder, renameFolder } from "../../services/folderController";
+import {
+  createFolder,
+  deleteFolder,
+  renameFolder,
+} from "../../services/folderController";
 import {
   createUserFiles,
   deleteUserFile,
@@ -10,6 +14,7 @@ import {
 import useDataStore from "../../store/useDataStore";
 import useVisibleRowsPosStore from "../../store/useVisibleRowsPosStore";
 import useFetchUserFiles from "../../hooks/useFetchUserFiles";
+import useFetchUser from "../../hooks/useFetchUser";
 
 const EditModal = () => {
   const editModalVisible = useVisibleRowsPosStore(
@@ -27,6 +32,7 @@ const EditModal = () => {
   const setSelectedRows = useVisibleRowsPosStore(
     (state) => state.setSelectedRows
   );
+  const selectedRows = useVisibleRowsPosStore((state) => state.selectedRows);
   const editModalType = useVisibleRowsPosStore((state) => state.editModalType);
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +43,7 @@ const EditModal = () => {
     selectedRecord?.name
   );
   const [fileInputValue, setFileInputValue] = useState(selectedRecord?.name);
+  const { debouncedFetchCurrentUser } = useFetchUser();
 
   useEffect(() => {
     if (editModalVisible && selectedRecord) {
@@ -53,10 +60,8 @@ const EditModal = () => {
     title = "创建文件夹";
   } else if (editModalType === "file") {
     title = "创建文件";
-  } else if (editModalType === "deleteFile") {
-    title = "删除文件";
-  } else if (editModalType === "deleteFolder") {
-    title = "删除文件夹";
+  } else if (editModalType === "delete") {
+    title = "删除文件或文件夹";
   } else if (editModalType === "renameFolder") {
     title = "重命名文件夹";
   } else if (editModalType === "renameFile") {
@@ -77,6 +82,7 @@ const EditModal = () => {
           const filesResp = await getUserFiles(pathRef.current);
           if (filesResp.data && filesResp.data.list) {
             setData(filesResp.data.list);
+            setSelectedRows([]);
           }
         } else if (response.code >= 400) {
           api.warning({
@@ -106,6 +112,7 @@ const EditModal = () => {
         if (response.code === 200 && response.data > 0) {
           // 刷新数据
           fetchUserFiles(pathRef.current);
+          setSelectedRows([]);
         } else if (response.code >= 400) {
           api.warning({
             message: response.message,
@@ -126,32 +133,50 @@ const EditModal = () => {
       });
     }
 
-    if (editModalType === "deleteFile") {
-      console.log("删除文件", selectedRecord);
-      setIsLoading(true);
-      try {
-        const response = await deleteUserFile(selectedRecord);
-        if (response.code === 200 && response.data >= 0) {
-          // 刷新数据
-          fetchUserFiles(pathRef.current);
-        } else if (response.code >= 400) {
-          api.warning({
-            message: response.message,
-          });
-        } else if (response.code >= 500) {
-          api.error({
-            message: response.message,
-          });
+    if (editModalType === "delete") {
+      for (const row of selectedRows) {
+        if (row.type === "file") {
+          try {
+            setIsLoading(true);
+            const resp = await deleteUserFile(row.userFileId, row.fileId, row.size);
+            if (resp.code === 200) {
+              fetchUserFiles(pathRef.current);
+              debouncedFetchCurrentUser();
+              api.success({
+                message: resp.message,
+              });
+            } else {
+              api.warning({
+                message: resp.message,
+              });
+            }
+          } finally {
+            setIsLoading(false);
+            setEditModalVisible(false);
+            setSelectedRows([]);
+          }
+        } else if (row.type === "folder") {
+          try {
+            setIsLoading(true);
+            const resp = await deleteFolder(row.folderId);
+            if (resp.code === 200) {
+              fetchUserFiles(pathRef.current);
+              debouncedFetchCurrentUser();
+              api.success({
+                message: resp.message,
+              });
+            } else {
+              api.warning({
+                message: resp.message,
+              });
+            }
+          } finally {
+            setIsLoading(false);
+            setEditModalVisible(false);
+            setSelectedRows([]);
+          }
         }
-      } finally {
-        setIsLoading(false);
-        setEditModalVisible(false);
-        setSelectedRows([]);
       }
-    }
-
-    if (editModalType === "deleteFolder") {
-      console.log("删除文件夹", selectedRecord);
     }
 
     if (editModalType === "renameFolder" && folderInputValue) {
@@ -270,10 +295,7 @@ const EditModal = () => {
             onChange={(e) => setFileInputValue(e.target.value)}
           />
         )}
-        {editModalType === "deleteFile" && <p>确认删除文件吗？</p>}
-        {editModalType === "deleteFolder" && (
-          <p>确认删除文件夹吗？该操作会删除该文件夹下所有文件和子文件夹！</p>
-        )}
+        {editModalType === "delete" && <p>确认删除吗？</p>}
       </Modal>
     </>
   );
