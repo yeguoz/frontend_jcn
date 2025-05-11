@@ -1,7 +1,8 @@
 import { Flex, GetProp, MenuProps, TableColumnsType } from "antd";
-import formatBytesUtil from "../utils/formatBytesUtil";
 import dateFormatUtil from "../utils/dateFormatUtil";
 import {
+  FileOutlined,
+  FileZipOutlined,
   FolderOpenOutlined,
   LoginOutlined,
   LogoutOutlined,
@@ -12,6 +13,8 @@ import {
 import ManagementIcon from "../components/icon/ManagementIcon";
 import MusicIcon from "../components/icon/MusicIcon";
 import DocumentIcon from "../components/icon/DocumentIcon";
+import { formatBytesUtil } from "../utils/formatUtil";
+import ExeIcon from "../components/icon/ExeIcon";
 
 type MenuItem = GetProp<MenuProps, "items">[number];
 
@@ -161,6 +164,7 @@ export const authItems: MenuItem[] = [
     icon: <UserAddOutlined style={{ fontSize: "1rem" }} />,
   },
 ];
+
 export const homeItems: MenuItem[] = [
   {
     label: <span style={{ fontSize: "1rem" }}>我的文件</span>,
@@ -175,18 +179,33 @@ export const homeItems: MenuItem[] = [
       },
       {
         label: "图片",
-        key: "picture",
+        key: "image",
         icon: <PictureOutlined />,
       },
       {
         label: "音乐",
-        key: "music",
+        key: "audio",
         icon: <MusicIcon />,
       },
       {
         label: "文档",
         key: "document",
         icon: <DocumentIcon />,
+      },
+      {
+        label: "压缩",
+        key: "archive",
+        icon: <FileZipOutlined />,
+      },
+      {
+        label: "可执行",
+        key: "executable",
+        icon: <ExeIcon />,
+      },
+      {
+        label: "其他",
+        key: "other",
+        icon: <FileOutlined />,
       },
     ],
   },
