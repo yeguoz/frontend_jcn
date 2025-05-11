@@ -19,7 +19,7 @@ const PwdCard = ({ api }: { api: NotificationInstance }) => {
   const setFileVisible = useShareStore((state) => state.setFileVisible);
   const infoData = useShareStore((state) => state.infoData);
   const url = import.meta.env.PROD
-    ? ""
+    ? `${import.meta.env.BASE_URL}/api/users/avatar?filePath=${infoData?.userVO?.avatar}`
     : `/api/users/avatar?filePath=${infoData?.userVO?.avatar}`;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
