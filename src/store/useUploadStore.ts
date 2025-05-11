@@ -68,14 +68,14 @@ const useUploadStore = create<UploadStore>((set, get) => ({
       })
     ),
 
-    getCompletedCount: () => {
-      const tasks = get().tasks;
-      let count = 0;
-      Object.keys(tasks).forEach((key) => {
-        if (tasks[key].completed) count++;
-      });
-      return count;
-    },
+  getCompletedCount: () => {
+    const tasks = get().tasks;
+    let count = 0;
+    Object.keys(tasks).forEach((key) => {
+      if (tasks[key].completed) count++;
+    });
+    return count;
+  },
 }));
 
 export default useUploadStore;
