@@ -1,10 +1,10 @@
 import { Flex, Tooltip } from "antd";
 import { CloudDownloadOutlined, EnterOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-import formatBytesUtil from "../../../utils/formatBytesUtil";
 import useShareStore from "../../../store/useShareStore";
 import useFetchSharedUserFiles from "../../../hooks/useFetchSharedUserFiles";
 import { fetchDownloadFile } from "../../../services/userFileController";
+import { formatBytesUtil } from "../../../utils/formatUtil";
 
 const HeaderMenu = () => {
   const selectedRows = useShareStore((state) => state.selectedRows);
@@ -67,12 +67,6 @@ const Folder = () => {
           <EnterOutlined className="outlinedIcon" onClick={onEnterFolder} />
         </Tooltip>
       </div>
-
-      <div className="icon">
-        <Tooltip title="打包下载" arrow={false} color={"#757575"}>
-          <CloudDownloadOutlined className="outlinedIcon" />
-        </Tooltip>
-      </div>
     </>
   );
 };
@@ -81,14 +75,10 @@ const File = () => {
   const navigate = useNavigate();
   const selectedRecord = useShareStore((state) => state.selectedRecord);
   const data = useShareStore((state) => state.data);
-  const shortId = useShareStore((state) => state.shortId);
   const setSelectedRows = useShareStore((state) => state.setSelectedRows);
 
-  const handleDownload = async () => {
-    await fetchDownloadFile(
-      data?.sourceName ? data?.sourceName : "",
-      shortId as string
-    );
+  const handleDownload = () => {
+    fetchDownloadFile(data?.sourceName ? data?.sourceName : "");
   };
 
   const handlePreview = () => {
@@ -120,15 +110,7 @@ const File = () => {
 };
 
 const Multiple = () => {
-  return (
-    <>
-      <div className="icon">
-        <Tooltip title="打包下载" arrow={false} color={"#757575"}>
-          <CloudDownloadOutlined className="outlinedIcon" />
-        </Tooltip>
-      </div>
-    </>
-  );
+  return <></>;
 };
 
 export default HeaderMenu;

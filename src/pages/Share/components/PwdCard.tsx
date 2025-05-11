@@ -18,6 +18,9 @@ const PwdCard = ({ api }: { api: NotificationInstance }) => {
   const setFolderVisible = useShareStore((state) => state.setFolderVisible);
   const setFileVisible = useShareStore((state) => state.setFileVisible);
   const infoData = useShareStore((state) => state.infoData);
+  const url = import.meta.env.PROD
+    ? ""
+    : `/api/users/avatar?filePath=${infoData?.userVO?.avatar}`;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -29,7 +32,7 @@ const PwdCard = ({ api }: { api: NotificationInstance }) => {
       return;
     }
 
-    // 请求接口/{shortId}
+    // 请求接口
     const response = await fetchSharedFile(shortId || "", password, path);
     const data: API.ShareVO = response.data;
     if (data) {
@@ -63,7 +66,7 @@ const PwdCard = ({ api }: { api: NotificationInstance }) => {
       <Card
         title={
           <Flex gap={10} align="center">
-            <Avatar size={"default"} icon={<UserOutlined />} />
+            <Avatar size={"default"} icon={<UserOutlined />} src={url}/>
             <Flex vertical={true}>
               <span>{infoData?.userVO.name} 的加密分享</span>
               <span style={{ fontSize: 12, color: "#757575" }}>

@@ -5,7 +5,7 @@ import useShareStore from "../../../store/useShareStore";
 import useFetchSharedUserFiles from "../../../hooks/useFetchSharedUserFiles";
 import { useNavigate } from "react-router";
 import Item from "../../../components/contextMenu/Item";
-import { fetchDownloadFile } from "../../../services/userFileController";
+import { fetchSharedDownloadFile } from "../../../services/shareController";
 
 const ItemContextMenu = React.forwardRef<
   HTMLDivElement,
@@ -60,7 +60,6 @@ const FolderContextMenu = () => {
         title={"进入文件夹"}
         onClick={onEnterFolder}
       />
-      <Item icon={<CloudDownloadOutlined />} title={"打包下载"} />
     </>
   );
 };
@@ -69,11 +68,15 @@ const FileContextMenu = () => {
   const navigate = useNavigate();
   const selectedRecord = useShareStore((state) => state.selectedRecord);
   const setSelectedRows = useShareStore((state) => state.setSelectedRows);
-  const setItemCtxMenuVisible = useShareStore((state) => state.setItemCtxMenuVisible);
+  const shortId = useShareStore((state) => state.shortId);
+  const setItemCtxMenuVisible = useShareStore(
+    (state) => state.setItemCtxMenuVisible
+  );
 
-  const dowloadFile = async () => {
-    await fetchDownloadFile(
-      selectedRecord?.sourceName as API.FileDTO["sourceName"]
+  const downloadFile = () => {
+    fetchSharedDownloadFile(
+      selectedRecord?.sourceName as API.FileDTO["sourceName"],
+      shortId as string
     );
     setSelectedRows([]);
   };
@@ -82,7 +85,9 @@ const FileContextMenu = () => {
     navigate(
       `/preview?filePath=${encodeURIComponent(
         selectedRecord?.sourceName as string
-      )}&filename=${encodeURIComponent(selectedRecord?.name as string)}`
+      )}&filename=${encodeURIComponent(
+        selectedRecord?.name as string
+      )}&shortId=${shortId}&isShare=true`
     );
     setItemCtxMenuVisible(false);
     setSelectedRows([]);
@@ -94,7 +99,7 @@ const FileContextMenu = () => {
       <Item
         icon={<CloudDownloadOutlined />}
         title={"下载文件"}
-        onClick={dowloadFile}
+        onClick={downloadFile}
       />
     </>
   );

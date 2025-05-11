@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  CloudDownloadOutlined,
-} from "@ant-design/icons";
-import styles from "./index.module.css";
 import useShareStore from "../../../store/useShareStore";
-import Item from "../../../components/contextMenu/Item";
 
 const MultipleMenu = React.forwardRef<
   HTMLDivElement,
@@ -32,9 +27,6 @@ const MultipleMenu = React.forwardRef<
       }}
       onMouseMove={handleMouseMove}
     >
-      <div className={styles.container}>
-        <Item icon={<CloudDownloadOutlined />} title={"打包下载"} />
-      </div>
     </div>
   );
 });

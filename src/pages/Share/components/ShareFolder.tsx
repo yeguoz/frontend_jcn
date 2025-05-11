@@ -30,6 +30,7 @@ const ShareFolder = ({ api }: { api: NotificationInstance }) => {
     (state) => state.sharedTableIsLoading
   );
   const { pwd, path, fetchSharedUserFiles } = useFetchSharedUserFiles();
+  const shortId = useShareStore((state) => state.shortId);
   const navigate = useNavigate();
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
@@ -68,7 +69,7 @@ const ShareFolder = ({ api }: { api: NotificationInstance }) => {
   };
 
   return (
-    <Flex vertical={true} flex={1} style={{width: "50%"}}>
+    <Flex vertical={true} flex={1} style={{ width: "50%" }}>
       <BreadcrumbToolkit />
       {sharedTableIsLoading ? (
         <div style={{ display: "flex", justifyContent: "center" }}>
@@ -93,26 +94,20 @@ const ShareFolder = ({ api }: { api: NotificationInstance }) => {
               setItemCtxMenuVisible(false);
               setMultipleMenuVisible(false);
               setSelectedRows(selectedRows);
-              // todo多选处理 显示菜单
               if (
                 selectedRows.length <= 1 &&
                 selectedRows[0]?.type === "folder"
               ) {
-                // todo 单选文件夹 显示菜单
-                console.log("选中文件夹selectedRows", selectedRows);
                 setSelectedRecord(selectedRows[0]);
               }
               if (
                 selectedRows.length <= 1 &&
                 selectedRows[0]?.type === "file"
               ) {
-                // todo 单选文件 显示菜单
-                console.log("选中文件selectedRows", selectedRows);
                 setSelectedRecord(selectedRows[0]);
               }
             },
           }}
-          locale={{ emptyText: "no data" }}
           onRow={(record) => {
             return {
               onClick: () => {}, // 点击行
@@ -135,10 +130,20 @@ const ShareFolder = ({ api }: { api: NotificationInstance }) => {
                     api.warning({ message: "预览禁用" });
                     return;
                   }
+                  // 处理预览逻辑
                   navigate(
-                    `/preview?filePath=${encodeURIComponent(
-                      record.sourceName
-                    )}&filename=${encodeURIComponent(record.name)}`
+                    `/preview?filename=${encodeURIComponent(
+                      data?.filename ? data?.filename : ""
+                    )}`,
+                    {
+                      state: {
+                        filePath: `${encodeURIComponent(
+                          data?.sourceName ? data?.sourceName : ""
+                        )}`,
+                        shortId: shortId,
+                        isShare: true,
+                      },
+                    }
                   );
                 }
               },
