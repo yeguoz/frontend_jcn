@@ -16,6 +16,7 @@ import {
   LockOutlined,
 } from "@ant-design/icons";
 import { createShortLink } from "../../services/shareController";
+import { generateRandomPwd } from "../../utils/generatePwd";
 
 export const ShareModal = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -37,16 +38,15 @@ export const ShareModal = () => {
   const [resultVisible, setResultVisible] = useState(false);
 
   const [pwdValue, setPwdValue] = useState("");
-  const [downloadValue, setDownloadValue] = useState(1);
+  const [downloadCount, setDownloadCount] = useState(1);
   const [timeValue, setTimeValue] = useState(60);
 
   const [pwdEnabled, setPwdEnabled] = useState(false);
   const [expireTimeEnabled, setExpireTimeEnabled] = useState(false);
   const [previewEnabled, setPreviewEnabled] = useState(false);
-  const [resultValue, setResultValue] = useState("");
+  const [shortId, setShortId] = useState("");
 
   const handlePwdChange = () => {
-    console.log("onChange");
     setPwdInputVisible(!pwdInputVisible);
     setPwdEnabled(!pwdEnabled);
   };
@@ -58,7 +58,7 @@ export const ShareModal = () => {
     setPreviewEnabled(!previewEnabled);
   };
   const generatePwd = () => {
-    const randomPwd = Math.random().toString(36).slice(-6);
+    const randomPwd = generateRandomPwd();
     setPwdValue(randomPwd);
   };
 
@@ -67,14 +67,18 @@ export const ShareModal = () => {
     setShareModalVisible(false);
   };
 
+  const resetStates = () => {
+    setPwdValue("");
+    setPwdEnabled(false);
+    setPwdInputVisible(false);
+    setDownloadCount(1);
+    setTimeValue(60);
+    setExpireTimeEnabled(false);
+    setExpireVisible(false);
+    setPreviewEnabled(false);
+  };
+
   const handleOk = async () => {
-    console.log("密码启用：", pwdEnabled);
-    console.log("密码：", pwdValue);
-    console.log("过期启用：", expireTimeEnabled);
-    console.log("过期下载：", downloadValue);
-    console.log("过期时间：", timeValue);
-    console.log("预览启用：", previewEnabled);
-    console.log("selectedRecord:", selectedRecord);
     const userId = selectedRecord?.userId as number;
     const sourceId = selectedRecord?.fileId
       ? selectedRecord?.fileId
@@ -82,7 +86,7 @@ export const ShareModal = () => {
     const isDir = selectedRecord?.type === "folder" ? 1 : 0;
 
     const expireTime = expireTimeEnabled
-      ? new Date(new Date().getTime() + timeValue * 1000)
+      ? new Date(new Date().getTime() + timeValue * 1000).toISOString()
       : null;
     const password = pwdEnabled ? pwdValue : null;
 
@@ -99,17 +103,17 @@ export const ShareModal = () => {
         userId,
         sourceId,
         userFileId: selectedRecord?.userFileId as number,
-        passwordEnabled:pwdEnabled,
+        passwordEnabled: pwdEnabled,
         password,
         isDir,
-        downloadCount: downloadValue,
+        remainingDownloads: downloadCount,
         previewEnabled,
         expireTimeEnabled,
         expireTime,
       });
-      console.log("response:", response);
+
       if (response.code == 200 && response.data) {
-        setResultValue(response.data);
+        setShortId(response.data);
         setResultVisible(true);
       } else if (response.code >= 400 && !response.data) {
         api.warning({
@@ -123,19 +127,9 @@ export const ShareModal = () => {
     } finally {
       setIsLoading(false);
       setShareModalVisible(false);
-
-      setPwdValue("");
-      setPwdEnabled(false);
-      setPwdInputVisible(false);
-
-      setDownloadValue(1);
-      setTimeValue(60);
-      setExpireTimeEnabled(false);
-      setExpireVisible(false);
-
-      setPreviewEnabled(false);
     }
   };
+
   return (
     <>
       {contextHolder}
@@ -189,7 +183,7 @@ export const ShareModal = () => {
                 min={1}
                 defaultValue={1}
                 addonAfter={<>次下载</>}
-                onChange={(value) => setDownloadValue(value as number)}
+                onChange={(value) => setDownloadCount(value as number)}
                 size="large"
                 variant="underlined"
                 changeOnWheel
@@ -215,43 +209,60 @@ export const ShareModal = () => {
           </Flex>
         </Flex>
       </Modal>
-      <Result
-        value={resultValue}
-        setValue={setResultValue}
-        resultVisible={resultVisible}
-        setResultVisible={setResultVisible}
-      />
+      {resultVisible && shortId && (
+        <Result
+          shortId={shortId}
+          setShortId={setShortId}
+          resultVisible={resultVisible}
+          setResultVisible={setResultVisible}
+          pwdEnabled={pwdEnabled}
+          pwdValue={pwdValue}
+          onClose={resetStates}
+        />
+      )}
     </>
   );
 };
 
 const Result = ({
-  value,
-  setValue,
+  shortId,
+  setShortId,
   resultVisible,
   setResultVisible,
+  pwdEnabled,
+  pwdValue,
+  onClose,
 }: {
-  value: string;
-  setValue: (value: string) => void;
+  shortId: string;
+  setShortId: (value: string) => void;
   resultVisible: boolean;
   setResultVisible: (value: boolean) => void;
+  pwdEnabled: boolean;
+  pwdValue: string;
+  onClose: () => void;
 }) => {
   const [link, setLink] = useState("");
   const [api, contextHolder] = notification.useNotification();
+
   useEffect(() => {
     const protocol = window.location.protocol;
     const host = window.location.hostname;
     const port = window.location.port;
-    setLink(`${protocol}//${host}:${port}/s/${value}`);
-  }, [value]);
+    const baseUrl = `${protocol}//${host}:${port}/s/${shortId}`;
+    const finalLink =
+      pwdEnabled && pwdValue ? `${baseUrl}?pwd=${pwdValue}` : baseUrl;
+    setLink(finalLink);
+  }, [shortId, pwdEnabled, pwdValue]);
 
   const handleCancel = () => {
     setResultVisible(false);
-    setValue("");
+    setShortId("");
+    onClose();
   };
+
   const handleOk = async () => {
     try {
-      (async () => await navigator.clipboard.writeText(link))(); // 将 value 复制到剪切板
+      (async () => await navigator.clipboard.writeText(link))();
       api.success({
         message: "复制成功",
       });
