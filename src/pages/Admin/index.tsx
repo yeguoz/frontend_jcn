@@ -4,8 +4,8 @@ import { Flex } from "antd";
 
 export const Admin = () => {
   return (
-    <Flex>
-      <AdminNavbar/>
+    <Flex style={{width: "100%"}}>
+      <AdminNavbar />
       <Outlet />
     </Flex>
   );
