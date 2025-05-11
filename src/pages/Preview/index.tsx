@@ -1,220 +1,222 @@
 import { Flex, Spin, Image, Select } from "antd";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useLocation, useSearchParams } from "react-router";
 import MDEditor from "@uiw/react-md-editor";
 import ReactPlayer from "react-player";
 import { Editor } from "@monaco-editor/react";
 import axios from "../../../config/axios";
-import { getSessionId } from "../../services/userController";
 import Navbar from "../../components/Navbar";
 import { authItems, homeItems } from "../../constants/common";
 import useAuthStore from "../../store/useAuthStore";
 
+const imageExtensions = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "avif",
+  "bmp",
+  "svg",
+  "ico",
+]);
+const videoExtensions = new Set([
+  "mp4",
+  "webm",
+  "ogv",
+  "mov",
+  "mkv",
+  "wmv",
+  "movie",
+]);
+const audioExtensions = new Set([
+  "mp3",
+  "aac",
+  "m4a",
+  "ogg",
+  "oga",
+  "opus",
+  "wav",
+  "flac",
+  "webm",
+]);
+const textFileExtensions = new Set([
+  // 纯文本 & 标记语言
+  "txt",
+  "md",
+  "csv",
+  "log",
+  "json",
+  "yaml",
+  "yml",
+  "xml",
+  "ini",
+  "toml",
+  "conf",
+  "tex",
+  "rst",
+  "asciidoc",
+  // Web 开发
+  "js",
+  "mjs",
+  "cjs",
+  "ts",
+  "tsx",
+  "jsx",
+  "vue",
+  "svelte",
+  "html",
+  "css",
+  "scss",
+  "sass",
+  "less",
+  // 后端开发
+  "java",
+  "kt",
+  "kts",
+  "groovy",
+  "scala",
+  "php",
+  "py",
+  "rb",
+  "go",
+  "rs",
+  "swift",
+  "dart",
+  "perl",
+  "pl",
+  "r",
+  "jl",
+  // C 语言家族
+  "c",
+  "h",
+  "cpp",
+  "cxx",
+  "cc",
+  "hpp",
+  "hxx",
+  "cs",
+  "m",
+  "mm",
+  // 脚本 & DevOps
+  "sh",
+  "bash",
+  "zsh",
+  "bat",
+  "cmd",
+  "ps1",
+  "dockerfile",
+  "tcl",
+  // 配置文件
+  "yaml",
+  "yml",
+  "json",
+  "toml",
+  "ini",
+  "conf",
+  // 数据库 & 查询语言
+  "sql",
+  "graphql",
+  "gql",
+  "cypher",
+  "prisma",
+  // 科学计算 & 数据分析
+  "ipynb",
+  "r",
+  "m",
+  "sas",
+  "stata",
+  "jl",
+  // 低级开发
+  "asm",
+  "s",
+  "a51",
+  "v",
+  "vh",
+  "vhd",
+  "vhdl",
+  // 函数式编程
+  "hs",
+  "ml",
+  "mli",
+  "clj",
+  "cljs",
+  "cljc",
+  "rkt",
+  "erl",
+  "hrl",
+  "ex",
+  "exs",
+  "f#",
+  "fs",
+  "fsi",
+  "fsx",
+  // 老牌语言
+  "pas",
+  "pp",
+  "adb",
+  "ads",
+  "for",
+  "f90",
+  "f95",
+  "lisp",
+  "cl",
+  "el",
+  "pro",
+]);
+
+const getFileType = (ext: string) => {
+  if (imageExtensions.has(ext)) return "image";
+  if (videoExtensions.has(ext)) return "video";
+  if (audioExtensions.has(ext)) return "audio";
+  if (textFileExtensions.has(ext)) return "text";
+  return "unsupported";
+};
+
 export const Preview = () => {
-  const imageExtensions = new Set([
-    "jpg",
-    "jpeg",
-    "png",
-    "gif",
-    "webp",
-    "avif",
-    "bmp",
-    "svg",
-    "ico"
-  ]);
-  const videoExtensions = new Set(["mp4", "webm", "ogv", "mov", "mkv","wmv","movie"]);
-  const audioExtensions = new Set([
-    "mp3",
-    "aac",
-    "m4a",
-    "ogg",
-    "oga",
-    "opus",
-    "wav",
-    "flac",
-    "webm",
-  ]);
-  const textFileExtensions = new Set([
-    // 纯文本 & 标记语言
-    "txt",
-    "md",
-    "csv",
-    "log",
-    "json",
-    "yaml",
-    "yml",
-    "xml",
-    "ini",
-    "toml",
-    "conf",
-    "tex",
-    "rst",
-    "asciidoc",
-    // Web 开发
-    "js",
-    "mjs",
-    "cjs",
-    "ts",
-    "tsx",
-    "jsx",
-    "vue",
-    "svelte",
-    "html",
-    "css",
-    "scss",
-    "sass",
-    "less",
-    // 后端开发
-    "java",
-    "kt",
-    "kts",
-    "groovy",
-    "scala",
-    "php",
-    "py",
-    "rb",
-    "go",
-    "rs",
-    "swift",
-    "dart",
-    "perl",
-    "pl",
-    "r",
-    "jl",
-    // C 语言家族
-    "c",
-    "h",
-    "cpp",
-    "cxx",
-    "cc",
-    "hpp",
-    "hxx",
-    "cs",
-    "m",
-    "mm",
-    // 脚本 & DevOps
-    "sh",
-    "bash",
-    "zsh",
-    "bat",
-    "cmd",
-    "ps1",
-    "dockerfile",
-    "tcl",
-    // 配置文件
-    "yaml",
-    "yml",
-    "json",
-    "toml",
-    "ini",
-    "conf",
-    // 数据库 & 查询语言
-    "sql",
-    "graphql",
-    "gql",
-    "cypher",
-    "prisma",
-    // 科学计算 & 数据分析
-    "ipynb",
-    "r",
-    "m",
-    "sas",
-    "stata",
-    "jl",
-    // 低级开发
-    "asm",
-    "s",
-    "a51",
-    "v",
-    "vh",
-    "vhd",
-    "vhdl",
-    // 函数式编程
-    "hs",
-    "ml",
-    "mli",
-    "clj",
-    "cljs",
-    "cljc",
-    "rkt",
-    "erl",
-    "hrl",
-    "ex",
-    "exs",
-    "f#",
-    "fs",
-    "fsi",
-    "fsx",
-    // 老牌语言
-    "pas",
-    "pp",
-    "adb",
-    "ads",
-    "for",
-    "f90",
-    "f95",
-    "lisp",
-    "cl",
-    "el",
-    "pro",
-  ]);
   const [searchParams] = useSearchParams();
-  const filePath = searchParams.get("filePath");
   const filename = searchParams.get("filename");
-  const shortId = searchParams.get("shortId");
+  
+  const location = useLocation();
+  const shortId = location.state?.shortId;
+  const isShare = location.state?.isShare || false;
+  const filePath = location.state?.filePath;
+
   const [language, setLanguage] = useState("javascript");
   const [editorTheme, setEditorTheme] = useState("light");
-  const [value, setValue] = useState<string>("");
-  const [sessionId, setSessionId] = useState<string>("");
+  const [fileContent, setFileContent] = useState<string>("");
   const [url, setUrl] = useState<string>("");
   const extension = filename?.split(".").pop()?.toLowerCase() || "";
 
+  const fileType = getFileType(extension);
+
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getSessionId();
-      setSessionId(response.data);
+      const pathAndParams = isShare
+        ? `/api/s/preview?filePath=${filePath}&shortId=${shortId}`
+        : `/api/userfile/preview?filePath=${filePath}`;
+
       setUrl(
         import.meta.env.PROD
-          ? ""
-          : `/api/${filePath}?token=${response.data}&shortId=${shortId}`
+          ? `${import.meta.env.BASE_URL}${pathAndParams}`
+          : `${pathAndParams}`
       );
     };
     fetchData();
   }, []);
 
   useEffect(() => {
-    const handleData = async () => {
+    if (fileType !== "text" || !url) return;
+    const fetchTextContent = async () => {
       try {
-        console.log("url:", url);
-        const response = await axios.get(url, {
-          responseType: "blob",
-        });
-
-        if (response.data instanceof Blob) {
-          const reader = new FileReader();
-
-          // 使用 Promise 包装 FileReader 的异步操作
-          const fileContent = await new Promise<string>((resolve, reject) => {
-            reader.onload = () => {
-              resolve(reader.result as string); // 获取文本内容
-            };
-            reader.onerror = () => {
-              reject(new Error("读取文件失败"));
-            };
-            reader.readAsText(response.data); // 读取 Blob 为文本
-          });
-
-          setValue(fileContent);
-        } else {
-          throw new Error("响应不是 Blob 类型");
-        }
-      } catch (error) {
-        console.error("请求失败:", error);
+        const res = await axios.get(url, { responseType: "blob" });
+        const text = await res.data.text();
+        setFileContent(text);
+      } catch (e) {
+        console.error("获取文本文件失败", e);
       }
     };
-    if (url !== "" && textFileExtensions.has(extension)) {
-      handleData();
-    }
+    fetchTextContent();
   }, [url]);
 
   // 图片文件预览
@@ -266,10 +268,10 @@ export const Preview = () => {
       return (
         <Container>
           <MDEditor
-            value={value}
+            value={fileContent}
             height="90%"
             style={{ width: "95%", marginTop: 20 }}
-            onChange={(newValue) => setValue(newValue || "")}
+            onChange={(newValue) => setFileContent(newValue || "")}
           />
         </Container>
       );
@@ -367,9 +369,9 @@ export const Preview = () => {
             width="100%"
             defaultLanguage="javascript"
             language={language}
-            value={value}
+            value={fileContent}
             theme={editorTheme}
-            onChange={(newValue) => setValue(newValue || "")}
+            onChange={(newValue) => setFileContent(newValue || "")}
             options={{ automaticLayout: true }}
             loading={<Spin />}
           />
@@ -387,7 +389,7 @@ export const Preview = () => {
   }
 
   if (extension === "doc" || extension === "docx") {
-    const url = `http://172.206.83.103:8080/api/${filePath}?token=${sessionId}`;
+    const url = `http://172.206.83.103:8080/api/${filePath}`;
     const encodedUrl = encodeURIComponent(btoa(encodeURIComponent(url)));
     return (
       <iframe
@@ -415,6 +417,7 @@ const Container = ({ children }: { children: JSX.Element }) => {
         <Navbar
           menuItems={homeItems}
           showStorage
+          optionOpen
           style={{
             flexShrink: 0,
           }}
