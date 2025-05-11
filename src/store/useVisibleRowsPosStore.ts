@@ -32,6 +32,10 @@ interface VisibleRowsPosStore {
   setMultipleMenuPosition: (pos: { x: number; y: number }) => void;
   selectedRecord: API.FileDTO | null;
   setSelectedRecord: (record: API.FileDTO | null) => void;
+  treeModalVisible: boolean;
+  setTreeModalVisible: (b: boolean) => void;
+  treeModalType: string;
+  setTreeModalType: (type: string) => void;
 }
 
 const useVisibleRowsPosStore = create<VisibleRowsPosStore>((set) => ({
@@ -65,7 +69,11 @@ const useVisibleRowsPosStore = create<VisibleRowsPosStore>((set) => ({
   },
   setMultipleMenuPosition: (pos) => set({ multipleMenuPosition: pos }),
   selectedRecord: null,
-  setSelectedRecord: (record) => set({ selectedRecord: record })
+  setSelectedRecord: (record) => set({ selectedRecord: record }),
+  treeModalVisible: false,
+  setTreeModalVisible: (b) => set({ treeModalVisible: b }),
+  treeModalType: "",
+  setTreeModalType: (type) => set({ treeModalType: type }),
 }));
 
 export default useVisibleRowsPosStore;
