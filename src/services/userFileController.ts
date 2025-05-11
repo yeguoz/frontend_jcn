@@ -20,6 +20,9 @@ export const createUserFiles = async (path: string, filename: string) => {
       params: {
         path,
         filename
+      },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
       }
     });
     return response.data;
@@ -28,38 +31,20 @@ export const createUserFiles = async (path: string, filename: string) => {
   }
 }
 
-export const fetchDownloadFile = async (filePath: string, shortId?: string) => {
-  try {
-    const response = await axios.get('/api/userfile/download/file', {
-      params: {
-        filePath,
-        shortId
-      },
-      responseType: 'stream',
-    });
-    const blob = new Blob([response.data]);
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    const disposition = response.headers['content-disposition'];
-    let fileName = 'downloaded_file';
-    if (disposition && disposition.indexOf('attachment') !== -1) {
-      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-      const matches = filenameRegex.exec(disposition);
-      if (matches != null && matches[1]) {
-        fileName = matches[1].replace(/['"]/g, '');
-      }
-    }
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-    return;
-  } catch (error) {
-    console.error('下载请求错误:', error);
-  }
-}
+export const fetchDownloadFile = (filePath: string) => {
+  const params = new URLSearchParams();
+  params.append("filePath", filePath);
+
+  const url = `/api/userfile/download?${params.toString()}`;
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', '');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 
 
 export const renameFile = async (id: number, name: string) => {
@@ -100,6 +85,9 @@ export const fetchUploadSession = async (fingerprint: string, totalChunks: numbe
           totalChunks,
           filename,
           fileSize,
+        },
+        paramsSerializer: (params) => {
+          return new URLSearchParams(params).toString();
         }
       });
     return response.data;
@@ -113,6 +101,9 @@ export const fetchUploadedChunks = async (fingerprint: string) => {
     const response = await axios.get('/api/userfile/uploaded/chunks', {
       params: {
         fingerprint
+      },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
       }
     });
     return response.data;
@@ -125,6 +116,9 @@ export const fetchChunksStatus = async (fingerprint: string) => {
   try {
     const response = await axios.get(`/api/userfile/uploaded/chunks/status`, {
       params: { fingerprint },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
+      }
     });
     return response.data;
   } catch (error) {
@@ -144,11 +138,12 @@ export const uploadChunk = async (
   fileSize: number,
   updateTask: (uploadId: string, updater: (task: UploadTask) => void) => void,
 ) => {
+  const encodedFilename = encodeURIComponent(filename);
+
   let lastTime = Date.now();
   let lastUploadedBytes = 0;
   const speedHistory: Record<string, number[]> = {};
   if (!speedHistory[uploadId]) speedHistory[uploadId] = [];
-
   const formData = new FormData();
   formData.append("fingerprint", fingerprint);
   formData.append("md5", md5);
@@ -158,7 +153,7 @@ export const uploadChunk = async (
   formData.append("fileSize", fileSize.toString());
 
   try {
-    const response = await axios.post(`/api/userfile/upload/chunk/${uploadId}/${filename}/${chunkIndex}`, formData, {
+    const response = await axios.post(`/api/userfile/upload/chunk/${uploadId}/${encodedFilename}/${chunkIndex}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
 
       onUploadProgress: (progressEvent) => {
@@ -216,20 +211,14 @@ export const mergeChunks = async (
         filename,
         totalChunks,
         webkitRelativePath
+      },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
       }
     });
     return response.data;
   } catch (error) {
     console.error(`合并分片错误:`, error);
-  }
-}
-
-export const fetchUserFiles = async () => {
-  try {
-    const response = await axios.get('/api/userfile/admin');
-    return response.data;
-  } catch (error) {
-    console.error('获取所有用户错误:', error);
   }
 }
 
@@ -239,6 +228,9 @@ export const moveUserFile = async (userFileId: number, targetFolderId: number) =
       params: {
         userFileId,
         targetFolderId
+      },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
       }
     });
     return response.data;
@@ -258,6 +250,9 @@ export const copyUserFile = async (fileSize: number, userFileId: number, targetF
           fileSize,
           userFileId,
           targetFolderId
+        },
+        paramsSerializer: (params) => {
+          return new URLSearchParams(params).toString();
         }
       });
     return response.data;
@@ -269,10 +264,41 @@ export const copyUserFile = async (fileSize: number, userFileId: number, targetF
 export const deleteUserFile = async (userFileId: number, fileId: number, fileSize: number) => {
   try {
     const response = await axios.delete('/api/userfile', {
-      params: { userFileId, fileId, fileSize }
+      params: { userFileId, fileId, fileSize },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
+      }
     });
     return response.data;
   } catch (error) {
     console.error('删除用户文件错误:', error);
+  }
+}
+
+export const searchUserFile = async (keyword: string) => {
+  try {
+    const response = await axios.get(`/api/userfile/search`, {
+      params: { keyword },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('搜索用户文件错误:', error);
+  }
+}
+
+export const searchUserFileByType = async (type: string) => {
+  try {
+    const response = await axios.get(`/api/userfile/search/type`, {
+      params: { type },
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('搜索用户文件错误:', error);
   }
 }
