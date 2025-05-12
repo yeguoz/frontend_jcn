@@ -162,7 +162,7 @@ const Header = () => {
             }
           }}
         >
-          CloudNest
+          Cloudnest
         </Link>
         <Input
           placeholder="搜索..."
