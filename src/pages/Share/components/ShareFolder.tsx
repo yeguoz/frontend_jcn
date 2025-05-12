@@ -125,21 +125,18 @@ const ShareFolder = ({ api }: { api: NotificationInstance }) => {
                   );
                 }
                 if (record.type === "file") {
-                  // 预览
                   if (!data?.previewEnabled) {
                     api.warning({ message: "预览禁用" });
                     return;
                   }
+
                   // 处理预览逻辑
                   navigate(
                     `/preview?filename=${encodeURIComponent(
-                      data?.filename ? data?.filename : ""
-                    )}`,
+                      record.name
+                    )}&filePath=${encodeURIComponent(record.sourceName)}`,
                     {
                       state: {
-                        filePath: `${encodeURIComponent(
-                          data?.sourceName ? data?.sourceName : ""
-                        )}`,
                         shortId: shortId,
                         isShare: true,
                       },

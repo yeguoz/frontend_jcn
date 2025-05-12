@@ -21,16 +21,14 @@ const ShareFile = () => {
       api.warning({ message: "预览禁用" });
       return;
     }
+    
     // 处理预览逻辑
     navigate(
       `/preview?filename=${encodeURIComponent(
-        data?.filename ? data?.filename : ""
-      )}`,
+        data?.filename
+      )}&filePath=${encodeURIComponent(data?.sourceName)}`,
       {
         state: {
-          filePath: `${encodeURIComponent(
-            data?.sourceName ? data?.sourceName : ""
-          )}`,
           shortId: shortId,
           isShare: true,
         },
@@ -79,11 +77,7 @@ const ShareFile = () => {
       >
         <Flex gap={10} align="center">
           {fileType ? (
-            <img
-              src={`/assets/images/${fileType}.svg`}
-              alt=""
-              width={40}
-            />
+            <img src={`/assets/images/${fileType}.svg`} alt="" width={40} />
           ) : (
             <img src={`/assets/images/file.svg`} alt="" width={40} />
           )}

@@ -176,11 +176,11 @@ const getFileType = (ext: string) => {
 export const Preview = () => {
   const [searchParams] = useSearchParams();
   const filename = searchParams.get("filename");
+  const filePath = searchParams.get("filePath");
 
   const location = useLocation();
   const shortId = location.state?.shortId;
   const isShare = location.state?.isShare || false;
-  const filePath = location.state?.filePath;
 
   const [language, setLanguage] = useState("javascript");
   const [editorTheme, setEditorTheme] = useState("light");
@@ -385,11 +385,11 @@ export const Preview = () => {
   }
 
   if (extension === "doc" || extension === "docx") {
-    const url = `http://172.206.83.103:8080/api/${filePath}`;
+    const url = `/api/userfile/preview?filePath=${filePath}`;
     const encodedUrl = encodeURIComponent(btoa(encodeURIComponent(url)));
     return (
       <iframe
-        src={`http://192.168.10.132:8012/onlinePreview?url=${encodedUrl}`}
+        src={`http://127.0.0.1:8012/onlinePreview?url=${encodedUrl}`}
         style={{ width: "100%", height: "100%" }}
       />
     );
