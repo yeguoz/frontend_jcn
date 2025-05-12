@@ -35,7 +35,7 @@ export const AuthManager = () => {
 
       res.data.forEach((item: API.SettingVO) => {
         initialValues[item.name] = {
-          value: item.value === "true" ? true : item.value,
+          value: item.value === "true" ? true : false,
           id: item.id,
         };
       });
