@@ -122,12 +122,11 @@ export const createGroup = async (groupName: string, policyId: number, maxStorag
   }
 }
 
-export const editGroup = async (id: number, groupName: string, policyId: number, maxStorage: number, shareEnabled: boolean) => {
+export const editGroup = async (id: number, policyId: number, maxStorage: number, shareEnabled: boolean) => {
   try {
     const response = await axios.put('/api/admin/group', null, {
       params: {
         id,
-        groupName,
         policyId,
         maxStorage,
         shareEnabled
