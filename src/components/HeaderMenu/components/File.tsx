@@ -1,7 +1,14 @@
 import { Tooltip } from "antd";
 import useVisibleRowsPosStore from "../../../store/useVisibleRowsPosStore";
 import { useNavigate } from "react-router";
-import { EnterOutlined, ShareAltOutlined, EditOutlined, ExportOutlined, DeleteOutlined, CloudDownloadOutlined } from "@ant-design/icons";
+import {
+  EnterOutlined,
+  ShareAltOutlined,
+  EditOutlined,
+  ExportOutlined,
+  DeleteOutlined,
+  CloudDownloadOutlined,
+} from "@ant-design/icons";
 
 const File = () => {
   const navigate = useNavigate();
@@ -49,14 +56,16 @@ const File = () => {
   };
 
   const onPreview = () => {
-    const sourceName = selectedRecord?.sourceName as string;
-    const name = selectedRecord?.name as string;
     navigate(
-      `/preview?filePath=${encodeURIComponent(
-        sourceName
-      )}&filename=${encodeURIComponent(name)}`
+      `/preview?filename=${encodeURIComponent(selectedRecord?.name as string)}`,
+      {
+        state: {
+          filePath: `${encodeURIComponent(
+            selectedRecord?.sourceName as string
+          )}`,
+        },
+      }
     );
-    setSelectedRows([]);
   };
 
   const onShare = () => {
@@ -74,9 +83,8 @@ const File = () => {
     setItemCtxMenuVisible?.(false);
     setEditModalVisible?.(true);
     setEditModalType?.("delete");
-  }
-  
-  
+  };
+
   return (
     <>
       <div className="icon">
