@@ -51,9 +51,7 @@ const Header = () => {
   const setIsAuth = useAuthStore((state) => state.setIsAuth);
   const setData = useDataStore((state) => state.setData);
   const [keyword, setKeyword] = useState("");
-  const url = import.meta.env.PROD
-    ? `${import.meta.env.BASE_URL}/api/users/avatar?filePath=${user?.avatar}`
-    : `/api/users/avatar?filePath=${user?.avatar}`;
+  const url = `/api/users/avatar?filePath=${user?.avatar}`;
 
   const completedCount = useUploadStore((state) =>
     Object.values(state.tasks).reduce(

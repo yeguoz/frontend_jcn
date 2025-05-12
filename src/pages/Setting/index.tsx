@@ -19,9 +19,7 @@ export const Setting = () => {
   const user = useAuthStore((state) => state.user);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editModalType, setEditModalType] = useState("");
-  const url = import.meta.env.PROD
-    ? `${import.meta.env.BASE_URL}/api/users/avatar?filePath=${user?.avatar}`
-    : `/api/users/avatar?filePath=${user?.avatar}`;
+  const url = `/api/users/avatar?filePath=${user?.avatar}`;
 
   const onEditNickname = () => {
     setEditModalVisible(true);
@@ -40,7 +38,7 @@ export const Setting = () => {
 
   return (
     <Flex style={{ flex: 1, overflow: "hidden" }}>
-      <Navbar menuItems={homeItems} showStorage optionOpen/>
+      <Navbar menuItems={homeItems} showStorage optionOpen />
       <Flex vertical={true} align="center" flex={1}>
         <div style={{ width: "70%", borderRadius: "6px" }}>
           {/* 个人资料 */}

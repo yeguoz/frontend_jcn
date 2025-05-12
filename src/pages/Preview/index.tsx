@@ -176,7 +176,7 @@ const getFileType = (ext: string) => {
 export const Preview = () => {
   const [searchParams] = useSearchParams();
   const filename = searchParams.get("filename");
-  
+
   const location = useLocation();
   const shortId = location.state?.shortId;
   const isShare = location.state?.isShare || false;
@@ -196,11 +196,7 @@ export const Preview = () => {
         ? `/api/s/preview?filePath=${filePath}&shortId=${shortId}`
         : `/api/userfile/preview?filePath=${filePath}`;
 
-      setUrl(
-        import.meta.env.PROD
-          ? `${import.meta.env.BASE_URL}${pathAndParams}`
-          : `${pathAndParams}`
-      );
+      setUrl(`${pathAndParams}`);
     };
     fetchData();
   }, []);

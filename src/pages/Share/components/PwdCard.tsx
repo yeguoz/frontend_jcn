@@ -18,9 +18,7 @@ const PwdCard = ({ api }: { api: NotificationInstance }) => {
   const setFolderVisible = useShareStore((state) => state.setFolderVisible);
   const setFileVisible = useShareStore((state) => state.setFileVisible);
   const infoData = useShareStore((state) => state.infoData);
-  const url = import.meta.env.PROD
-    ? `${import.meta.env.BASE_URL}/api/users/avatar?filePath=${infoData?.userVO?.avatar}`
-    : `/api/users/avatar?filePath=${infoData?.userVO?.avatar}`;
+  const url = `/api/users/avatar?filePath=${infoData?.userVO?.avatar}`;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -62,11 +60,15 @@ const PwdCard = ({ api }: { api: NotificationInstance }) => {
   };
 
   return (
-    <Flex justify="center" align="center"  style={{ margin: "100px auto 0",height:'250px' }}>
+    <Flex
+      justify="center"
+      align="center"
+      style={{ margin: "100px auto 0", height: "250px" }}
+    >
       <Card
         title={
           <Flex gap={10} align="center">
-            <Avatar size={"default"} icon={<UserOutlined />} src={url}/>
+            <Avatar size={"default"} icon={<UserOutlined />} src={url} />
             <Flex vertical={true}>
               <span>{infoData?.userVO.name} 的加密分享</span>
               <span style={{ fontSize: 12, color: "#757575" }}>

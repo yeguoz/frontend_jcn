@@ -14,9 +14,7 @@ const ShareFile = () => {
   const shortId = useShareStore((state) => state.shortId);
   const [fileType, setFileType] = useState<string | undefined>(undefined);
   const [api, contextHolder] = notification.useNotification();
-  const url = import.meta.env.PROD
-    ? `${import.meta.env.BASE_URL}/api/users/avatar?filePath=${data?.userVO?.avatar}`
-    : `/api/users/avatar?filePath=${data?.userVO?.avatar}`;
+  const url = `/api/users/avatar?filePath=${data?.userVO?.avatar}`;
 
   const handlePreview = () => {
     if (!data?.previewEnabled) {
@@ -81,7 +79,11 @@ const ShareFile = () => {
       >
         <Flex gap={10} align="center">
           {fileType ? (
-            <img src={`/public/assets/images/${fileType}.svg`} alt="" width={40} />
+            <img
+              src={`/public/assets/images/${fileType}.svg`}
+              alt=""
+              width={40}
+            />
           ) : (
             <img src={`/public/assets/images/file.svg`} alt="" width={40} />
           )}
