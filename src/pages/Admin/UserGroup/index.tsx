@@ -68,10 +68,6 @@ export const UserGroup = () => {
         <Space size="middle">
           <a
             onClick={() => {
-              if (record.id === 1 || record.id === 2) {
-                api.warning({ message: "默认系统组不能编辑" });
-                return;
-              }
               navigate(`edit`, { state: { ...record } });
             }}
           >
