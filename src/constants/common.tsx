@@ -110,10 +110,10 @@ export const filesColumns: TableColumnsType<API.FileDTO> = [
         <a>
           <Flex align="center" gap={10}>
             {record.type === "folder" ? (
-              <img src="/public/assets/images/folder.svg" alt="" width={30} />
+              <img src="/assets/images/folder.svg" alt="" width={30} />
             ) : (
               <img
-                src={`/public/assets/images/${fileType}.svg`}
+                src={`/assets/images/${fileType}.svg`}
                 alt=""
                 width={30}
               />

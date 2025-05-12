@@ -41,8 +41,8 @@ export const MyShare = () => {
               fileType = getFileType(extension);
             }
             const src = isDir
-              ? "/public/assets/images/folder.svg"
-              : `/public/assets/images/${fileType}.svg`;
+              ? "/assets/images/folder.svg"
+              : `/assets/images/${fileType}.svg`;
             return (
               <List.Item>
                 <ShareItemCard key={item.id} data={item} src={src} />
