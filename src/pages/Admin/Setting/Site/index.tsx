@@ -1,7 +1,7 @@
 import { Button, Flex, Input, notification, Form } from "antd";
 import { useEffect } from "react";
-import { getSettingByType } from "../../../services/settingController";
-import { editSiteInfo } from "../../../services/adminController";
+import { getSettingByType } from "../../../../services/settingController";
+import { editSiteInfo } from "../../../../services/adminController";
 
 export const Site = () => {
   const [form] = Form.useForm();

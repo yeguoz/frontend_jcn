@@ -1,7 +1,7 @@
 import { Button, Flex, Input, notification, Form } from "antd";
-import { getSettingByType } from "../../../services/settingController";
+import { getSettingByType } from "../../../../services/settingController";
 import TextArea from "antd/es/input/TextArea";
-import { editMailInfo } from "../../../services/adminController";
+import { editMailInfo } from "../../../../services/adminController";
 import { useEffect } from "react";
 
 export const Mail = () => {

@@ -1,7 +1,10 @@
 import { Button, Flex, Input, notification, Form, Switch, Select } from "antd";
 import { useEffect, useState } from "react";
-import { getSettingByType } from "../../../services/settingController";
-import { editAuthInfo, fetchGroups } from "../../../services/adminController";
+import { getSettingByType } from "../../../../services/settingController";
+import {
+  editAuthInfo,
+  fetchGroups,
+} from "../../../../services/adminController";
 
 export const AuthManager = () => {
   const [form] = Form.useForm();
@@ -40,7 +43,7 @@ export const AuthManager = () => {
         } else {
           value = item.value;
         }
-        
+
         initialValues[item.name] = {
           value,
           id: item.id,
