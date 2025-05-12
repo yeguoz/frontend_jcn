@@ -132,6 +132,7 @@ const FolderContextMenu = () => {
 };
 
 const FileContextMenu = () => {
+  const navigate = useNavigate();
   const setItemCtxMenuVisible = useVisibleRowsPosStore(
     (state) => state.setItemCtxMenuVisible
   );
@@ -192,9 +193,22 @@ const FileContextMenu = () => {
     setTreeModalType("move");
   };
 
+  const onPreview = () => {
+    navigate(
+      `/preview?filename=${encodeURIComponent(selectedRecord?.name as string)}`,
+      {
+        state: {
+          filePath: `${encodeURIComponent(
+            selectedRecord?.sourceName as string
+          )}`,
+        },
+      }
+    );
+  };
+
   return (
     <>
-      <Item icon={<EnterOutlined />} title={"打开文件"} />
+      <Item icon={<EnterOutlined />} title={"打开文件"} onClick={onPreview}/>
       <Item
         icon={<CloudDownloadOutlined />}
         title={"下载文件"}
