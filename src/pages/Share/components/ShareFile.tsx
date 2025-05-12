@@ -81,9 +81,9 @@ const ShareFile = () => {
       >
         <Flex gap={10} align="center">
           {fileType ? (
-            <img src={`/src/assets/images/${fileType}.svg`} alt="" width={40} />
+            <img src={`/public/assets/images/${fileType}.svg`} alt="" width={40} />
           ) : (
-            <img src={`/src/assets/images/file.svg`} alt="" width={40} />
+            <img src={`/public/assets/images/file.svg`} alt="" width={40} />
           )}
           <Flex vertical={true}>
             <div>

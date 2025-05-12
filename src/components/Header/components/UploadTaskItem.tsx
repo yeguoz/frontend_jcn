@@ -25,7 +25,7 @@ const UploadTaskItem = ({ uploadId }: { uploadId: string }) => {
   return (
     <List.Item>
       <List.Item.Meta
-        avatar={<Avatar src={`/src/assets/images/${fileType}.svg`} />}
+        avatar={<Avatar src={`/public/assets/images/${fileType}.svg`} />}
         title={task?.filename}
         description={
           <>
