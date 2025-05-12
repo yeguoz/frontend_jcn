@@ -43,7 +43,6 @@ export const Share = () => {
 
   useEffect(() => {
     setShortId(shortId as string);
-    console.log("shortId", shortId);
     const fetchInfoData = async () => {
       const response = await fetchSharedFileInfo(shortId as string);
       if (response.code === 200) {
@@ -52,7 +51,6 @@ export const Share = () => {
         api.warning({ message: response.message });
         return;
       }
-      console.log("response.data", response.data);
       setInfoData(response.data);
       if (response.data.passwordEnabled) {
         setPwdVisible(true);
@@ -71,7 +69,6 @@ export const Share = () => {
         api.warning({ message: response.message });
         return;
       }
-      console.log(response.data);
       setData(response.data);
       setPwdVisible(false);
 
