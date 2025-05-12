@@ -21,8 +21,10 @@ const BreadcrumbToolkit = () => {
     currentRoute: Partial<
       BreadcrumbItemType & BreadcrumbSeparatorType & { search: boolean }
     >,
-    _0: object,
-    _1: Partial<BreadcrumbItemType & BreadcrumbSeparatorType>[],
+    _: object,
+    routes: Partial<
+      BreadcrumbItemType & BreadcrumbSeparatorType & { search?: boolean }
+    >[],
     paths: string[]
   ) {
     const onClick = async () => {
@@ -30,9 +32,12 @@ const BreadcrumbToolkit = () => {
         paths[paths.length - 1] === "" ? "/" : paths[paths.length - 1];
       const previousPath =
         paths[paths.length - 2] === "" ? "/" : paths[paths.length - 2];
+      const isSearch = routes[routes.length - 1].search;
+
       if (currentPath === currentRoute.path) {
         fetchUserFiles(pathRef.current);
-      } else if (previousPath === currentRoute.path) {
+      } else if (previousPath === currentRoute.path && isSearch) {
+        // 搜索回到根目录
         fetchUserFiles(pathRef.current);
         setItems([{ path: "/", name: "/", search: false }]);
       }
