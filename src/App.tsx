@@ -1,7 +1,7 @@
 import "./App.css";
 import { Navigate, Route, Routes } from "react-router";
 import NotFound from "./pages/404";
-import Forget from "./pages/Auth/ForgetPwd";
+import { ForgetPwd } from "./pages/Auth/ForgetPwd";
 import { useEffect, useState } from "react";
 import { getAuthSetting } from "./services/settingController";
 import useSettingStore from "./store/useSettingStore";
@@ -31,10 +31,10 @@ import { EditUserGroup } from "./pages/Admin/UserGroup/EiditUserGroup";
 import { AddUserGroup } from "./pages/Admin/UserGroup/AddUserGroup";
 import { Verify } from "./pages/Auth/Verify";
 import ResetPwd from "./pages/Auth/ResetPwd";
-import { Mail } from "./pages/Admin/Setting/Mail";
+import { MyShare } from "./pages/MyShare";
 import { Site } from "./pages/Admin/Setting/Site";
 import { AuthManager } from "./pages/Admin/Setting/AuthManager";
-import { MyShare } from "./pages/MyShare";
+import { Mail } from "./pages/Admin/Setting/Mail";
 const App = () => {
   const setAuthSettings = useSettingStore((state) => state.setAuthSettings);
   const setUser = useAuthStore((state) => state.setUser);
@@ -100,7 +100,7 @@ const App = () => {
                 >
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/forget" element={<Forget />} />
+                  <Route path="/forget" element={<ForgetPwd />} />
                   <Route path="/reset" element={<ResetPwd />} />
                   <Route path="/verify/:type" element={<Verify />} />
                 </Route>
