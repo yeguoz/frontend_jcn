@@ -1,7 +1,6 @@
 import {
   Button,
   Flex,
-  Input,
   notification,
   Switch,
   Form,
@@ -17,7 +16,7 @@ const { Option } = Select;
 
 export const EditUserGroup = () => {
   const {
-    state: { id, name, maxStorage, shareEnabled, policyId },
+    state: { id, maxStorage, shareEnabled, policyId },
   } = useLocation();
 
   const [form] = Form.useForm();
@@ -50,7 +49,6 @@ export const EditUserGroup = () => {
 
     const res = await editGroup(
       id,
-      values.groupName,
       values.policyId,
       finalStorage,
       values.shareEnabled
@@ -90,25 +88,11 @@ export const EditUserGroup = () => {
         variant="underlined"
         onFinish={onFinish}
         initialValues={{
-          groupName: name,
           maxStorage: formatBytesToUnit(maxStorage, "GB"),
           policyId: policyId,
           shareEnabled: shareEnabled === 1,
         }}
       >
-        <Form.Item
-          label="组名"
-          name="groupName"
-          style={{ width: 200 }}
-          rules={[
-            { required: true, message: "请输入组名" },
-            { max: 10, message: "组名最多10个字符" },
-            { min: 4, message: "组名最少4个字符" },
-            { pattern: /^[a-zA-Z0-9]+$/, message: "组名只能包含数字和字母" },
-          ]}
-        >
-          <Input />
-        </Form.Item>
         <Form.Item
           label="存储策略"
           name="policyId"
