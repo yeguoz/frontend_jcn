@@ -34,8 +34,15 @@ export const AuthManager = () => {
       > = {};
 
       res.data.forEach((item: API.SettingVO) => {
+        let value;
+        if (item.value === "true" || item.value === "false") {
+          value = item.value === "true" ? true : false;
+        } else {
+          value = item.value;
+        }
+        
         initialValues[item.name] = {
-          value: item.value === "true" ? true : false,
+          value,
           id: item.id,
         };
       });
