@@ -527,14 +527,9 @@ export const Home = () => {
                     if (record.type === "file") {
                       setSelectedRows([]);
                       navigate(
-                        `/preview?filename=${encodeURIComponent(record.name)}`,
-                        {
-                          state: {
-                            filePath: `${encodeURIComponent(
-                              record.sourceName
-                            )}`,
-                          },
-                        }
+                        `/preview?filename=${encodeURIComponent(
+                          record.name
+                        )}&filePath=${encodeURIComponent(record.sourceName)}`
                       );
                     }
                   },
