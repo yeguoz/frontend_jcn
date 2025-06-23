@@ -89,7 +89,7 @@ const FolderContextMenu = () => {
   };
 
   const onDelete = () => {
-    setEditModalType("deleteFolder");
+    setEditModalType("delete");
     setEditModalVisible(true);
     setItemCtxMenuVisible(false);
   };
